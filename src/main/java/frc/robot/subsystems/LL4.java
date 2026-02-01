@@ -10,16 +10,22 @@ import frc.robot.LimelightHelpers.RawFiducial;
 
 public class LL4 extends SubsystemBase {
 
+  /** ⚠️ 必須與 Limelight Web UI 的 Device Name 完全一致 */
   private final String name;
 
+  /** 預設使用 limelight-shoot */
   public LL4() {
-    this("");
+    this("limelight-shoot");
   }
 
   public LL4(String name) {
-    this.name = (name == null) ? "" : name;
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("Limelight name CANNOT be empty");
+    }
+    this.name = name;
   }
 
+  // ===================== Basic Targeting =====================
   public boolean hasTarget() {
     return LimelightHelpers.getTV(name);
   }
@@ -31,10 +37,15 @@ public class LL4 extends SubsystemBase {
   public double getTXNC() { return LimelightHelpers.getTXNC(name); }
   public double getTYNC() { return LimelightHelpers.getTYNC(name); }
 
-  public double getTagID() { return LimelightHelpers.getFiducialID(name); }
+  public double getTagID() {
+    return LimelightHelpers.getFiducialID(name);
+  }
 
-  public double getHeartbeat() { return LimelightHelpers.getHeartbeat(name); }
+  public double getHeartbeat() {
+    return LimelightHelpers.getHeartbeat(name);
+  }
 
+  // ===================== Pipeline / LED =====================
   public void setPipeline(int index) {
     LimelightHelpers.setPipelineIndex(name, index);
   }
@@ -44,6 +55,7 @@ public class LL4 extends SubsystemBase {
   public void ledForceOff()        { LimelightHelpers.setLEDMode_ForceOff(name); }
   public void ledForceBlink()      { LimelightHelpers.setLEDMode_ForceBlink(name); }
 
+  // ===================== Pose Estimation =====================
   public PoseEstimate getPoseEstimateBlue_MegaTag1() {
     return LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
   }
@@ -60,10 +72,15 @@ public class LL4 extends SubsystemBase {
       double rollDeg,
       double rollRateDegPerSec
   ) {
-    LimelightHelpers.SetRobotOrientation(name, yawDeg, yawRateDegPerSec,
-        pitchDeg, pitchRateDegPerSec, rollDeg, rollRateDegPerSec);
+    LimelightHelpers.SetRobotOrientation(
+        name,
+        yawDeg, yawRateDegPerSec,
+        pitchDeg, pitchRateDegPerSec,
+        rollDeg, rollRateDegPerSec
+    );
   }
 
+  // ===================== Raw Data =====================
   public RawFiducial[] getRawFiducials() {
     return LimelightHelpers.getRawFiducials(name);
   }
@@ -84,14 +101,7 @@ public class LL4 extends SubsystemBase {
     LimelightHelpers.SetIMUAssistAlpha(name, alpha);
   }
 
-  public void setRewindEnabled(boolean enabled) {
-    LimelightHelpers.setRewindEnabled(name, enabled);
-  }
-
-  public void triggerRewindCapture(double seconds) {
-    LimelightHelpers.triggerRewindCapture(name, seconds);
-  }
-
+  // ===================== Debug Dashboard =====================
   @Override
   public void periodic() {
     SmartDashboard.putString("LL4/Name", name);

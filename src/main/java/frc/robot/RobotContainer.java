@@ -34,7 +34,7 @@ public class RobotContainer {
     // ===================== Subsystems =====================
     private final Shooter m_shooter = new Shooter();
     private final Intake  m_intake  = new Intake();
-    private final LL4 m_Ll4 = new LL4("");
+    private final LL4 m_Ll4 = new LL4("limelight-shoot");
 
     public final CommandSwerveDrivetrain drivetrain =
             TunerConstants.createDrivetrain();
@@ -71,7 +71,7 @@ public class RobotContainer {
                 .toggleOnTrue(new Shooter_test(m_shooter, 0.0));
 
         new JoystickButton(testJoy, ConsController.Button.BUTTON_Y.id)
-                .toggleOnTrue(new Shooter_test(m_shooter, 0.5));
+                .whileTrue(new ShooterEasy(m_shooter));
     }
 
     private void setDefaultCommand() {

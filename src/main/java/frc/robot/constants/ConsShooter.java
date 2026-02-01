@@ -51,9 +51,9 @@ public final class ConsShooter {
 
   private static final Slot0Configs ANGLE_POS_SLOT0 =
       new Slot0Configs()
-          .withKP(10)
+          .withKP(0.8)
           .withKI(0)
-          .withKD(1);
+          .withKD(0);
 
   static {
 
@@ -66,7 +66,7 @@ public final class ConsShooter {
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackSensorSource   = FeedbackSensorSourceValue.FusedCANcoder;
 
     ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 1.0;
-    ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio =10;
+    ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio =1.0;
 
     ANGLE_MOTOR_CONFIG.Slot0 = ANGLE_POS_SLOT0;
   }
