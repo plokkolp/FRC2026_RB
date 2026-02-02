@@ -15,22 +15,18 @@ import frc.robot.constants.ConsShooter;
 
 public class Shooter extends SubsystemBase {
 
-  // ===================== Motors =====================
   private final TalonFX leftShooter  = new TalonFX(ConsShooter.LEFT_SHOOTER_ID);
   private final TalonFX rightShooter = new TalonFX(ConsShooter.RIGHT_SHOOTER_ID);
 
   private final TalonFX train = new TalonFX(ConsShooter.TRAIN_ID);
 
-  private final TalonFX angleMotor = new TalonFX(ConsShooter.ANGLE_MOTOR_ID);   // Yaw (砲塔旋轉)
+  private final TalonFX angleMotor = new TalonFX(ConsShooter.ANGLE_MOTOR_ID);   // Yaw 
   private final CANcoder angleCancoder = new CANcoder(ConsShooter.ANGLE_CANCODER_ID);
 
   private final TalonFXS minionMotor = new TalonFXS(ConsShooter.MINION_MOTOR_ID); // Pitch
 
-  // ===================== Limelight (只先合 tx) =====================
-  // ⚠️ 必須與 Limelight Web UI 的 Device Name 完全一致
   private final LL4 ll4 = new LL4("limelight-shoot");
 
-  // ===================== Control Objects (復用避免一直 new) =====================
   private final DutyCycleOut shooterDuty = new DutyCycleOut(0);
   private final DutyCycleOut trainDuty   = new DutyCycleOut(0);
   private final DutyCycleOut yawDuty     = new DutyCycleOut(0);
@@ -54,7 +50,7 @@ public class Shooter extends SubsystemBase {
     minionMotor.getConfigurator().apply(ConsShooter.MINION_MOTOR_CONFIG);
   }
 
-  // ===================== Shooter Wheels =====================
+
   public void setShooterSpeed(double duty) {
     duty = MathUtil.clamp(duty, -1.0, 1.0);
     shooterDuty.Output = duty;
@@ -102,7 +98,7 @@ public class Shooter extends SubsystemBase {
     return rightShooter.getPosition().getValueAsDouble();
   }
 
-  // ===================== Train =====================
+
   public void setTrainSpeed(double duty) {
     duty = MathUtil.clamp(duty, -1.0, 1.0);
     trainDuty.Output = duty;
@@ -117,7 +113,7 @@ public class Shooter extends SubsystemBase {
     return train.getPosition().getValueAsDouble();
   }
 
-  // ===================== Yaw (砲塔角度) =====================
+
   public void setYawSpeed(double duty) {
     duty = MathUtil.clamp(duty, -1.0, 1.0);
     yawDuty.Output = duty;
@@ -140,7 +136,6 @@ public class Shooter extends SubsystemBase {
     angleMotor.setControl(yawPos.withPosition(absRot));
   }
 
-  // ✅ 你說一定要保留（砲塔 motorposrot）
   public double getYawMotorPositionRot() {
     return angleMotor.getPosition().getValueAsDouble();
   }
@@ -149,7 +144,6 @@ public class Shooter extends SubsystemBase {
     return angleMotor.getClosedLoopError().getValueAsDouble();
   }
 
-  // ✅ 你說一定要保留：直接 set motorposrot 當目標
   public void setYawMotorPosRot(double targetMotorPosRot) {
     angleMotor.setControl(yawPos.withPosition(targetMotorPosRot));
   }
@@ -173,7 +167,7 @@ public class Shooter extends SubsystemBase {
     return getShooterAngleRotContinuous() * 360.0;
   }
 
-  // ===================== Pitch =====================
+
   public void setPitchSpeed(double duty) {
     duty = MathUtil.clamp(duty, -1.0, 1.0);
     pitchDuty.Output = duty;
@@ -198,7 +192,7 @@ public class Shooter extends SubsystemBase {
     stopPitch();
   }
 
-  // ===================== Limelight TX (degrees) =====================
+
   public boolean hasLLTarget() {
     return ll4.hasTarget();
   }
@@ -210,7 +204,6 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
 
-    // ===== 原本的 dashboard =====
     SmartDashboard.putNumber("Shooter/LeftRPM", getLeftShooterRPM());
     SmartDashboard.putNumber("Shooter/RightRPM", getRightShooterRPM());
     SmartDashboard.putNumber("Shooter/AvgRPM", getShooterRPM());
@@ -220,19 +213,19 @@ public class Shooter extends SubsystemBase {
 
     SmartDashboard.putNumber("Train/PosRot", getTrainPositionRot());
 
-    SmartDashboard.putNumber("Yaw/CAN_AbsRot", getYawCanRot());
-    SmartDashboard.putNumber("Yaw/CAN_NoOffsetRot", getYawCanNoOffsetRot());
+    // SmartDashboard.putNumber("Yaw/CAN_AbsRot", getYawCanRot());
+    // SmartDashboard.putNumber("Yaw/CAN_NoOffsetRot", getYawCanNoOffsetRot());
     SmartDashboard.putNumber("Yaw/MotorPosRot", getYawMotorPositionRot());
-    SmartDashboard.putNumber("Yaw/ClosedLoopError", getYawClosedLoopError());
+    // SmartDashboard.putNumber("Yaw/ClosedLoopError", getYawClosedLoopError());
 
-    SmartDashboard.putNumber("Pitch/MotorPosRot", getPitchPositionRot());
+    // SmartDashboard.putNumber("Pitch/MotorPosRot", getPitchPositionRot());
 
-    SmartDashboard.putNumber("Yaw/ShooterAngle0-360", getShooterAngle0to360Rot());        // 0~1
-    SmartDashboard.putNumber("Yaw/ShooterAngle", getShooterAngleRotContinuous());         // continuous (rot)
-    SmartDashboard.putNumber("Yaw/ShooterAngleDeg0-360", getShooterAngle0to360Deg());     // 0~360 deg
-    SmartDashboard.putNumber("Yaw/ShooterAngleDeg", getShooterAngleDegContinuous());      // continuous deg
+    // SmartDashboard.putNumber("Yaw/ShooterAngle0-360", getShooterAngle0to360Rot());        // 0~1
+    // SmartDashboard.putNumber("Yaw/ShooterAngle", getShooterAngleRotContinuous());         // rot
+    // SmartDashboard.putNumber("Yaw/ShooterAngleDeg0-360", getShooterAngle0to360Deg());     // 0~360 deg
+    // SmartDashboard.putNumber("Yaw/ShooterAngleDeg", getShooterAngleDegContinuous());      // continuous deg
 
-    // ===== 新增：Limelight tx =====
+
     SmartDashboard.putBoolean("LL/HasTarget", hasLLTarget());
     SmartDashboard.putNumber("LL/tx", getLLTx());
   }

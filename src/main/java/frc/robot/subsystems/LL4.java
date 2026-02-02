@@ -10,10 +10,8 @@ import frc.robot.LimelightHelpers.RawFiducial;
 
 public class LL4 extends SubsystemBase {
 
-  /** ⚠️ 必須與 Limelight Web UI 的 Device Name 完全一致 */
   private final String name;
 
-  /** 預設使用 limelight-shoot */
   public LL4() {
     this("limelight-shoot");
   }
@@ -25,7 +23,6 @@ public class LL4 extends SubsystemBase {
     this.name = name;
   }
 
-  // ===================== Basic Targeting =====================
   public boolean hasTarget() {
     return LimelightHelpers.getTV(name);
   }
@@ -45,7 +42,6 @@ public class LL4 extends SubsystemBase {
     return LimelightHelpers.getHeartbeat(name);
   }
 
-  // ===================== Pipeline / LED =====================
   public void setPipeline(int index) {
     LimelightHelpers.setPipelineIndex(name, index);
   }
@@ -80,7 +76,6 @@ public class LL4 extends SubsystemBase {
     );
   }
 
-  // ===================== Raw Data =====================
   public RawFiducial[] getRawFiducials() {
     return LimelightHelpers.getRawFiducials(name);
   }
@@ -101,7 +96,6 @@ public class LL4 extends SubsystemBase {
     LimelightHelpers.SetIMUAssistAlpha(name, alpha);
   }
 
-  // ===================== Debug Dashboard =====================
   @Override
   public void periodic() {
     SmartDashboard.putString("LL4/Name", name);

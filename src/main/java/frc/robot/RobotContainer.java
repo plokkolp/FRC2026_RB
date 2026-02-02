@@ -9,15 +9,19 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.constants.ConsController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 
 public class RobotContainer {
 
@@ -26,12 +30,10 @@ public class RobotContainer {
     private final double maxAngularRate =
             RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
-    // ===================== Joysticks (依 ConsController port) =====================
-    private final Joystick driver   = new Joystick(ConsController.kDriveControllerPort);      // 原本 driver (Xbox)
-    private final Joystick testJoy  = new Joystick(3);                                        // 你原本 Test = port 3（ConsController 沒定義，我照你現有保留）
-    private final Joystick operator = new Joystick(ConsController.kOperatorControllerPort);   // 原本 operator
+    private final XboxController driver   = new XboxController(ConsController.kDriveControllerPort);      
+    private final XboxController testJoy  = new XboxController(3);                                       
+    private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);  
 
-    // ===================== Subsystems =====================
     private final Shooter m_shooter = new Shooter();
     private final Intake  m_intake  = new Intake();
     private final LL4 m_Ll4 = new LL4("limelight-shoot");
@@ -58,12 +60,13 @@ public class RobotContainer {
 
     private void configureBindings() {
         setDefaultCommand();
+                Trigger leftTrigger = new Trigger(() ->
+          testJoy.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id) > 1);
+          
 
-        // driver A：煞車
         new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
                 .whileTrue(drivetrain.applyRequest(() -> brake));
 
-        // driver LB：重設 Field Centric
         new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
                 .onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -71,12 +74,12 @@ public class RobotContainer {
                 .toggleOnTrue(new Shooter_test(m_shooter, 0.0));
 
         new JoystickButton(testJoy, ConsController.Button.BUTTON_Y.id)
-                .whileTrue(new ShooterEasy(m_shooter));
+                .whileTrue(new ShooterEasy(m_shooter,testJoy));
     }
 
     private void setDefaultCommand() {
 
-        // ===================== Drivetrain Default =====================
+
         drivetrain.setDefaultCommand(
                 new Drive(
                         drivetrain,
@@ -86,7 +89,7 @@ public class RobotContainer {
                 )
         );
 
-        // ===================== Shooter Default =====================
+
         m_shooter.setDefaultCommand(
                 new ShooterTest(
                         m_shooter,
@@ -97,7 +100,7 @@ public class RobotContainer {
                 )
         );
 
-        // ===================== Intake Default =====================
+
         m_intake.setDefaultCommand(
                 new IntakeTest(
                         m_intake,

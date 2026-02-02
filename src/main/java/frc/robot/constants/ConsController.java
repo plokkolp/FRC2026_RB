@@ -5,6 +5,7 @@ public class ConsController {
     public static final int kOperatorControllerPort = 1;
     public static final int kButtonBroadControllerPort = 2;
     public static final double DEADBAND = 0.05;
+    public static final String ConsControll = null;
     public enum Axis {
         LEFT_STICK_X(0),
         LEFT_STICK_Y(1),

@@ -6,15 +6,15 @@ import com.ctre.phoenix6.signals.*;
 public final class ConsShooter {
 
 
-  public static final int LEFT_SHOOTER_ID   = 21;
-  public static final int RIGHT_SHOOTER_ID  = 22;
+  public static final int LEFT_SHOOTER_ID = 21;
+  public static final int RIGHT_SHOOTER_ID = 22;
 
-  public static final int TRAIN_ID          = 23;
+  public static final int TRAIN_ID = 23;
 
-  public static final int ANGLE_MOTOR_ID    = 24;
+  public static final int ANGLE_MOTOR_ID = 24;
   public static final int ANGLE_CANCODER_ID = 25;
 
-  public static final int MINION_MOTOR_ID   = 20;
+  public static final int MINION_MOTOR_ID = 20;
 
 
   public static final TalonFXConfiguration LEFT_SHOOTER_CONFIG  = new TalonFXConfiguration();
@@ -22,10 +22,10 @@ public final class ConsShooter {
 
   private static final Slot0Configs SHOOTER_VEL_SLOT0 =
       new Slot0Configs()
-          .withKP(0.5)
+          .withKP(0.30)
           .withKI(0.00)
           .withKD(0.00)
-          .withKV(0.12);
+          .withKV(0.00);
 
   static {
     LEFT_SHOOTER_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -52,8 +52,8 @@ public final class ConsShooter {
   private static final Slot0Configs ANGLE_POS_SLOT0 =
       new Slot0Configs()
           .withKP(0.8)
-          .withKI(0)
-          .withKD(0);
+          .withKI(0.0)
+          .withKD(0.0);
 
   static {
 
@@ -80,9 +80,9 @@ public final class ConsShooter {
 
   private static final Slot0Configs MINION_POS_SLOT0 =
       new Slot0Configs()
-          .withKP(1)
-          .withKI(0)
-          .withKD(0.5);
+          .withKP(1.0)
+          .withKI(0.0)
+          .withKD(0.0);
 
   static {
     MINION_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;

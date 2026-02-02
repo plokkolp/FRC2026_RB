@@ -1,62 +1,79 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.constants.ConsIntake;
+
 public class Intake extends SubsystemBase {
 
-  private final TalonFX haveRolling = new TalonFX(11);
-  private final TalonFX trainRolling = new TalonFX(12);
-  private final TalonFX haveangle = new TalonFX(13);
+  // ===================== Motors =====================
+  private final TalonFX haveRolling  = new TalonFX(ConsIntake.HAVE_ROLLING_ID);
+  private final TalonFX trainRolling = new TalonFX(ConsIntake.TRAIN_ROLLING_ID);
+  private final TalonFX haveAngle    = new TalonFX(ConsIntake.HAVE_ANGLE_ID);
 
-  private final MotionMagicVoltage m_mmReq = new MotionMagicVoltage(0);
+  private final DutyCycleOut haveDuty  = new DutyCycleOut(0);
+  private final DutyCycleOut trainDuty = new DutyCycleOut(0);
+  private final DutyCycleOut angleDuty = new DutyCycleOut(0);
+
+  private final MotionMagicVoltage angleMM = new MotionMagicVoltage(0);
 
   public Intake() {
-
-    TalonFXConfiguration krakenConfigs = new TalonFXConfiguration();
-    krakenConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    
-    krakenConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    haveRolling.getConfigurator().apply(krakenConfigs);
-    
-    krakenConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    trainRolling.getConfigurator().apply(krakenConfigs);
-
-    krakenConfigs.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    haveangle.getConfigurator().apply(krakenConfigs);
+    haveRolling.getConfigurator().apply(ConsIntake.ROLLING_CONFIG);
+    trainRolling.getConfigurator().apply(ConsIntake.ROLLING_CONFIG);
+    haveAngle.getConfigurator().apply(ConsIntake.ANGLE_CONFIG);
   }
 
-  public void haveSpeed(double speed) {
-    haveRolling.setControl(new DutyCycleOut(speed));
+  public void setRolling(double duty) {
+    duty = MathUtil.clamp(duty, -1.0, 1.0);
+    haveDuty.Output = duty;
+    haveRolling.setControl(haveDuty);
   }
 
-  public void trainSpeed(double speed) {
-    trainRolling.setControl(new DutyCycleOut(speed));
+  public double getRollingRPS() {
+    return haveRolling.getVelocity().getValueAsDouble();
   }
 
-  public double getAnglePosition() {
-    return haveangle.getPosition().getValueAsDouble();
+  public void setTrainRolling(double duty) {
+    duty = MathUtil.clamp(duty, -1.0, 1.0);
+    trainDuty.Output = duty;
+    trainRolling.setControl(trainDuty);
   }
-  public void setAnglePosition(double rotations) {
-    haveangle.setControl(m_mmReq.withPosition(rotations));
+
+  public double getTrainRollingRPS() {
+    return trainRolling.getVelocity().getValueAsDouble();
   }
-  public void setAnglespeed(double speed) {
-    haveangle.setControl(new DutyCycleOut(speed));
+
+
+  public void setAnglePositionRot(double rot) {
+    haveAngle.setControl(angleMM.withPosition(rot));
   }
-   @Override
-    public void periodic() {
-      SmartDashboard.putNumber("havePosition", getAnglePosition());
-    }
+
+  public void setAngleSpeed(double duty) {
+    duty = MathUtil.clamp(duty, -1.0, 1.0);
+    angleDuty.Output = duty;
+    haveAngle.setControl(angleDuty);
   }
+
+  public double getAnglePositionRot() {
+    return haveAngle.getPosition().getValueAsDouble();
+  }
+
+  public double getAngleVelocityRPS() {
+    return haveAngle.getVelocity().getValueAsDouble();
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Intake/AnglePosRot", getAnglePositionRot());
+    SmartDashboard.putNumber("Intake/AngleVelRPS", getAngleVelocityRPS());
+
+    SmartDashboard.putNumber("Intake/HaveRollerRPS", getRollingRPS());
+    SmartDashboard.putNumber("Intake/TrainRollerRPS", getTrainRollingRPS());
+  }
+}

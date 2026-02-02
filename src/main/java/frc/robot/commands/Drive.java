@@ -15,7 +15,6 @@ public class Drive extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     private final DoubleSupplier vX, vY, vOmega;
 
-    // ===== 可調參數 =====
     private static final double kTransDeadband = 0.1;   
     private static final double kRotDeadband   = 0.10;  
     private final SwerveRequest.FieldCentric driveRequest =
@@ -34,7 +33,9 @@ public class Drive extends Command {
         this.vOmega = vOmega;
         addRequirements(drivetrain);
     }
-
+    @Override
+    public void initialize() {}
+    
     @Override
     public void execute() {
 
@@ -49,4 +50,12 @@ public class Drive extends Command {
                 .withRotationalRate(omega)
         );
     }
-}
+    
+    @Override
+    public void end(boolean interrupted) {}
+    
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+    }

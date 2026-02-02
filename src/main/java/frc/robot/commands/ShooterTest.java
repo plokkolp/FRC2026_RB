@@ -15,7 +15,9 @@ public class ShooterTest extends Command {
 
     addRequirements(shooter);
   }
-
+  @Override
+  public void initialize() {}
+  
   @Override
   public void execute() {
 
@@ -25,5 +27,10 @@ public class ShooterTest extends Command {
 
   @Override
   public void end(boolean interrupted) {
+  }
+  
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }

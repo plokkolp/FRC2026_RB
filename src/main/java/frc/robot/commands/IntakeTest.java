@@ -23,15 +23,20 @@ public class IntakeTest extends Command {
   @Override
   public void execute() {
     double rollingSpeed = isAPressed.getAsBoolean() ? 1.0 : 0.0;
-    intake.haveSpeed(rollingSpeed);
+    intake.setRolling(rollingSpeed);
 
     double anglespeed = (up.getAsDouble() - down.getAsDouble()) / 4.0;
-    intake.setAnglespeed(anglespeed); 
+    intake.setAngleSpeed(anglespeed); 
   }
 
   @Override
   public void end(boolean interrupted) {
-    intake.haveSpeed(0);
-    intake.setAnglespeed(0);
+    intake.setRolling(0);
+    intake.setAngleSpeed(0);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }
