@@ -22,6 +22,46 @@ public class LL4 extends SubsystemBase {
     }
     this.name = name;
   }
+  /** 取得「最佳」AprilTag 的直線距離(公尺)，抓不到回傳 NaN */
+  public double getBestTagDistanceMeters() {
+    RawFiducial[] tags = getRawFiducials();
+    if (tags == null || tags.length == 0) return Double.NaN;
+
+    RawFiducial best = null;
+
+    for (RawFiducial t : tags) {
+      // 基本過濾：距離要是正常值
+      if (!Double.isFinite(t.distToRobot) || t.distToRobot <= 0.0) continue;
+
+      if (best == null) {
+        best = t;
+        continue;
+      }
+
+      // 選擇策略：ambiguity 越小越好
+      // 若 ambiguity 差不多，選 ta(面積)較大者
+      if (t.ambiguity < best.ambiguity - 1e-6) {
+        best = t;
+      } else if (Math.abs(t.ambiguity - best.ambiguity) <= 1e-6 && t.ta > best.ta) {
+        best = t;
+      }
+    }
+
+    return (best == null) ? Double.NaN : best.distToRobot;
+  }
+
+  /** 指定 tagId 的直線距離(公尺)，找不到回傳 NaN */
+  public double getTagDistanceMeters(int tagId) {
+    RawFiducial[] tags = getRawFiducials();
+    if (tags == null || tags.length == 0) return Double.NaN;
+
+    for (RawFiducial t : tags) {
+      if (t.id == tagId && Double.isFinite(t.distToRobot) && t.distToRobot > 0.0) {
+        return t.distToRobot;
+      }
+    }
+    return Double.NaN;
+  }
 
   public boolean hasTarget() {
     return LimelightHelpers.getTV(name);

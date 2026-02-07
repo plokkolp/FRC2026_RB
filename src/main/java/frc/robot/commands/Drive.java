@@ -17,8 +17,10 @@ public class Drive extends Command {
 
     private static final double kTransDeadband = 0.1;   
     private static final double kRotDeadband   = 0.10;  
-    private final SwerveRequest.FieldCentric driveRequest =
-        new SwerveRequest.FieldCentric()
+    //  private final SwerveRequest.FieldCentric driveRequest =
+    //    new SwerveRequest.FieldCentric()
+    private final SwerveRequest.RobotCentric driveRequest =
+    new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     public Drive(
@@ -32,7 +34,7 @@ public class Drive extends Command {
         this.vY = vY;
         this.vOmega = vOmega;
         addRequirements(drivetrain);
-    }
+    }   
     @Override
     public void initialize() {}
     

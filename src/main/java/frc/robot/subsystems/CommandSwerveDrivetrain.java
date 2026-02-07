@@ -227,15 +227,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   @Override
   public void periodic() {
 
-    if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-      DriverStation.getAlliance().ifPresent(alliance -> {
-        setOperatorPerspectiveForward(
-            alliance == Alliance.Red
-                ? kRedAlliancePerspectiveRotation
-                : kBlueAlliancePerspectiveRotation);
-        m_hasAppliedOperatorPerspective = true;
-      });
-    }
+    // if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+    //   DriverStation.getAlliance().ifPresent(alliance -> {
+    //     setOperatorPerspectiveForward(
+    //         alliance == Alliance.Red
+    //             ? kRedAlliancePerspectiveRotation
+    //             : kBlueAlliancePerspectiveRotation);
+    //     m_hasAppliedOperatorPerspective = true;
+    //   });
+    // }
+    if (!m_hasAppliedOperatorPerspective) {
+    DriverStation.getAlliance().ifPresent(alliance -> {
+      setOperatorPerspectiveForward(
+          alliance == Alliance.Red
+              ? kRedAlliancePerspectiveRotation
+              : kBlueAlliancePerspectiveRotation);
+      m_hasAppliedOperatorPerspective = true;
+    });
+  }
 
     // ===== Vision 相關先全部註解掉（暫時不用）=====
     /*
@@ -258,9 +267,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   @Override
-  public void resetPose(Pose2d pose) {
-    super.resetPose(pose);
-  }
+public void resetPose(Pose2d pose) {
+  System.out.println("[RESET POSE] " + pose);
+  Thread.dumpStack();
+  super.resetPose(pose);
+}
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
     return run(() -> setControl(requestSupplier.get()));
