@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.*;
+
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -15,7 +16,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -33,9 +33,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
-// ===== Vision 相關先全部註解掉（暫時不用）=====
-// import frc.robot.subsystems.Vision.VisionUpdate;
-
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
 
   private static final double kSimLoopPeriod = 0.005;
@@ -43,21 +40,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private Notifier m_simNotifier = null;
   private double m_lastSimTime;
 
-  private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
-  private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
-
-  private boolean m_hasAppliedOperatorPerspective = false;
-
-  // ===== Vision 相關先全部註解掉（暫時不用）=====
-  // private final Vision m_vision;
-  // private boolean m_hasVisionInitializedPose = false;
-  // private boolean m_allowVisionReset = true;
-
   private Supplier<Boolean> m_allianceSupplier;
 
   private final SwerveRequest.ApplyRobotSpeeds m_pathApply =
       new SwerveRequest.ApplyRobotSpeeds();
 
+  // ===== SysId =====
   private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
       new SwerveRequest.SysIdSwerveTranslation();
 
@@ -108,17 +96,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
+  // ===== Debug =====
+  private int m_resetPoseCount = 0;
+
   public CommandSwerveDrivetrain(
       SwerveDrivetrainConstants drivetrainConstants,
       SwerveModuleConstants<?, ?, ?>... modules) {
-
     super(drivetrainConstants, modules);
-
-    // ===== Vision 相關先全部註解掉（暫時不用）=====
-    // m_vision = new Vision(this);
-
     configurePathPlanner();
-
     if (Utils.isSimulation()) startSimThread();
   }
 
@@ -126,14 +111,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       SwerveDrivetrainConstants drivetrainConstants,
       double odometryUpdateFrequency,
       SwerveModuleConstants<?, ?, ?>... modules) {
-
     super(drivetrainConstants, odometryUpdateFrequency, modules);
-
-    // ===== Vision 相關先全部註解掉（暫時不用）=====
-    // m_vision = new Vision(this);
-
     configurePathPlanner();
-
     if (Utils.isSimulation()) startSimThread();
   }
 
@@ -143,30 +122,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Matrix<N3, N1> odometryStdDevs,
       Matrix<N3, N1> visionStdDevs,
       SwerveModuleConstants<?, ?, ?>... modules) {
-
     super(
         drivetrainConstants,
         odometryUpdateFrequency,
         odometryStdDevs,
         visionStdDevs,
         modules);
-
-    // ===== Vision 相關先全部註解掉（暫時不用）=====
-    // m_vision = new Vision(this);
-
     configurePathPlanner();
-
     if (Utils.isSimulation()) startSimThread();
   }
 
-  // 航向
+  // ===== Alliance =====
   public void setAllianceSupplier(Supplier<Boolean> allianceSupplier) {
     this.m_allianceSupplier = allianceSupplier;
   }
 
+  // 這個會改 Pose heading（不是純 gyro 歸零），先保留但不要亂呼叫
   public void autoSeedFieldCentric() {
     double angle = (m_allianceSupplier != null && m_allianceSupplier.get()) ? 180.0 : 0.0;
     this.resetPose(new Pose2d(getState().Pose.getTranslation(), Rotation2d.fromDegrees(angle)));
+  }
+
+  /**
+   * ★關鍵：提供「場地向」用的 heading。
+   * 你目前的現象（車轉θ，正向轉2θ）幾乎等於 gyro 角度符號反了。
+   * 所以這裡直接回傳 -yaw 來修正。
+   */
+  public Rotation2d getFieldHeading() {
+    // 你 SmartDashboard 的 GyroYaw 顯示就是 degrees 量級（87、173那種）
+    double yawDeg = getPigeon2().getYaw().getValueAsDouble();
+    return Rotation2d.fromDegrees(-yawDeg); // ★修正 2θ 的核心
   }
 
   private void configurePathPlanner() {
@@ -174,9 +159,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     try {
       config = RobotConfig.fromGUISettings();
     } catch (Exception e) {
-      DriverStation.reportError(
-          "PathPlanner Config Error: " + e.getMessage(),
-          e.getStackTrace());
+      DriverStation.reportError("PathPlanner Config Error: " + e.getMessage(), e.getStackTrace());
       return;
     }
 
@@ -184,9 +167,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         this::getPose,
         this::resetPose,
         this::getRobotRelativeSpeeds,
-        speeds -> {
-          setControl(m_pathApply.withSpeeds(speeds));
-        },
+        speeds -> setControl(m_pathApply.withSpeeds(speeds)),
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
             new PIDConstants(5.0, 0.0, 0.0)),
@@ -195,67 +176,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         this);
   }
 
-  // ===== Vision 相關先全部註解掉（暫時不用）=====
-  /*
-  public void handleVisionUpdate(VisionUpdate update) {
-    switch (update.action) {
-      case INITIALIZE:
-        if (DriverStation.isDisabled()
-            && m_allowVisionReset
-            && !m_hasVisionInitializedPose) {
-          resetPose(update.pose);
-          m_hasVisionInitializedPose = true;
-        }
-        break;
-
-      case FUSE:
-        addVisionMeasurement(
-            update.pose,
-            update.timestamp,
-            VecBuilder.fill(
-                update.stdX,
-                update.stdY,
-                update.stdTheta));
-        break;
-
-      default:
-        break;
-    }
-  }
-  */
-
   @Override
   public void periodic() {
-
-    // if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-    //   DriverStation.getAlliance().ifPresent(alliance -> {
-    //     setOperatorPerspectiveForward(
-    //         alliance == Alliance.Red
-    //             ? kRedAlliancePerspectiveRotation
-    //             : kBlueAlliancePerspectiveRotation);
-    //     m_hasAppliedOperatorPerspective = true;
-    //   });
-    // }
-    if (!m_hasAppliedOperatorPerspective) {
-    DriverStation.getAlliance().ifPresent(alliance -> {
-      setOperatorPerspectiveForward(
-          alliance == Alliance.Red
-              ? kRedAlliancePerspectiveRotation
-              : kBlueAlliancePerspectiveRotation);
-      m_hasAppliedOperatorPerspective = true;
-    });
-  }
-
-    // ===== Vision 相關先全部註解掉（暫時不用）=====
-    /*
-    if (DriverStation.isDisabled()) {
-      m_allowVisionReset = true;
-    } else {
-      m_allowVisionReset = false;
-    }
-
-    m_vision.periodic();
-    */
+    // ===== Debug：只看真正會變的值 =====
+    SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
+    SmartDashboard.putNumber("DEBUG/FieldHeadingDeg_used", getFieldHeading().getDegrees());
+    SmartDashboard.putNumber("DEBUG/PoseDeg", getState().Pose.getRotation().getDegrees());
+    SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
+    SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
   }
 
   public Pose2d getPose() {
@@ -267,11 +195,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   @Override
-public void resetPose(Pose2d pose) {
-  System.out.println("[RESET POSE] " + pose);
-  Thread.dumpStack();
-  super.resetPose(pose);
-}
+  public void resetPose(Pose2d pose) {
+    m_resetPoseCount++;
+
+    SmartDashboard.putNumber("DEBUG/LastReset_X", pose.getX());
+    SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
+    SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
+
+    System.out.println("[RESET POSE] " + pose);
+    Thread.dumpStack();
+
+    super.resetPose(pose);
+  }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
     return run(() -> setControl(requestSupplier.get()));
@@ -303,10 +238,7 @@ public void resetPose(Pose2d pose) {
   }
 
   @Override
-  public void addVisionMeasurement(
-      Pose2d pose,
-      double timestampSeconds,
-      Matrix<N3, N1> stdDevs) {
+  public void addVisionMeasurement(Pose2d pose, double timestampSeconds, Matrix<N3, N1> stdDevs) {
     super.addVisionMeasurement(pose, timestampSeconds, stdDevs);
   }
 }

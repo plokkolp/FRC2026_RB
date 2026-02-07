@@ -15,7 +15,7 @@ public class Intake extends SubsystemBase {
 
   // ===================== Motors =====================
   private final TalonFX haveRolling  = new TalonFX(ConsIntake.HAVE_ROLLING_ID);
-  private final TalonFX trainRolling = new TalonFX(ConsIntake.TRAIN_ROLLING_ID);
+  // private final TalonFX trainRolling = new TalonFX(ConsIntake.TRAIN_ROLLING_ID);
   private final TalonFX haveAngle    = new TalonFX(ConsIntake.HAVE_ANGLE_ID);
 
   private final DutyCycleOut haveDuty  = new DutyCycleOut(0);
@@ -28,7 +28,7 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     haveRolling.getConfigurator().apply(ConsIntake.ROLLING_CONFIG);
-    trainRolling.getConfigurator().apply(ConsIntake.ROLLING_CONFIG);
+    // trainRolling.getConfigurator().apply(ConsIntake.ROLLING_CONFIG);
     haveAngle.getConfigurator().apply(ConsIntake.ANGLE_CONFIG);
   }
 
@@ -42,15 +42,15 @@ public class Intake extends SubsystemBase {
     return haveRolling.getVelocity().getValueAsDouble();
   }
 
-  public void setTrainRolling(double duty) {
-    duty = MathUtil.clamp(duty, -1.0, 1.0);
-    trainDuty.Output = duty;
-    trainRolling.setControl(trainDuty);
-  }
+  // public void setTrainRolling(double duty) {
+  //   duty = MathUtil.clamp(duty, -1.0, 1.0);
+  //   trainDuty.Output = duty;
+  //   // trainRolling.setControl(trainDuty);
+  // }
 
-  public double getTrainRollingRPS() {
-    return trainRolling.getVelocity().getValueAsDouble();
-  }
+  // public double getTrainRollingRPS() {
+  //   return trainRolling.getVelocity().getValueAsDouble();
+  // }
 
 
   public void setAnglePositionRot(double rot) {
@@ -81,6 +81,6 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/AngleVelRPS", getAngleVelocityRPS());
 
     SmartDashboard.putNumber("Intake/HaveRollerRPS", getRollingRPS());
-    SmartDashboard.putNumber("Intake/TrainRollerRPS", getTrainRollingRPS());
+    // SmartDashboard.putNumber("Intake/TrainRollerRPS", getTrainRollingRPS());
   }
 }

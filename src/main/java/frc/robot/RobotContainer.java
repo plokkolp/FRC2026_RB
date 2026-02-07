@@ -65,6 +65,10 @@ public class RobotContainer {
                 Trigger leftTrigger = new Trigger(() ->
           testJoy.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id) > 1);
           
+         new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+    .                   onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+// new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+//     .onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         // new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
         //         .whileTrue(drivetrain.applyRequest(() -> brake));
@@ -82,7 +86,7 @@ public class RobotContainer {
         // new JoystickButton(testJoy, ConsController.Button.BUTTON_Y.id)
         //         .toggleOnTrue(new GetFuel(m_intake));
 
-          new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
+          new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
                 .toggleOnTrue(new ShooterEasy(m_shooter,testJoy));
          
     }
