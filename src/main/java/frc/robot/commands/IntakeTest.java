@@ -7,11 +7,11 @@ import frc.robot.subsystems.Intake;
 
 public class IntakeTest extends Command {
   private final Intake intake;
-  private final DoubleSupplier up;     // 改名以便閱讀：對應右手板機
-  private final DoubleSupplier down;   // 改名以便閱讀：對應左手板機
-  private final BooleanSupplier isAPressed; // 控制滾動
+  private final DoubleSupplier up;     
+  private final DoubleSupplier down;   
+  private final DoubleSupplier isAPressed; 
 
-  public IntakeTest(Intake intake, DoubleSupplier up, DoubleSupplier down, BooleanSupplier isAPressed) {
+  public IntakeTest(Intake intake, DoubleSupplier up, DoubleSupplier down, DoubleSupplier isAPressed) {
     this.intake = intake;
     this.up = up;
     this.down = down;
@@ -22,7 +22,7 @@ public class IntakeTest extends Command {
 
   @Override
   public void execute() {
-    double rollingSpeed = isAPressed.getAsBoolean() ? 1.0 : 0.0;
+    double rollingSpeed = isAPressed.getAsDouble();
     intake.setRolling(rollingSpeed);
 
     double anglespeed = (up.getAsDouble() - down.getAsDouble()) / 4.0;

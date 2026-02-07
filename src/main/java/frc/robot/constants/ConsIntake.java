@@ -31,11 +31,11 @@ public final class ConsIntake {
     ANGLE_CONFIG = new TalonFXConfiguration();
 
     ANGLE_CONFIG.MotorOutput = new MotorOutputConfigs()
-        .withNeutralMode(NeutralModeValue.Brake)
+        .withNeutralMode(NeutralModeValue.Coast)
         .withInverted(InvertedValue.CounterClockwise_Positive);
 
     ANGLE_CONFIG.Slot0 = new Slot0Configs()
-        .withKP(1)
+        .withKP(2)
         .withKI(0)
         .withKD(0);
 

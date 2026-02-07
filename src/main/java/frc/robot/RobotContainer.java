@@ -33,6 +33,8 @@ public class RobotContainer {
     private final XboxController driver   = new XboxController(ConsController.kDriveControllerPort);      
     private final XboxController testJoy  = new XboxController(3);                                       
     private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);  
+    private final XboxController TT  = new XboxController(4);                                       
+
 
     private final Shooter m_shooter = new Shooter();
     private final Intake  m_intake  = new Intake();
@@ -41,7 +43,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain =
             TunerConstants.createDrivetrain();
 
-    private final Vision vision = new Vision(drivetrain);
+//     private final Vision vision = new Vision(drivetrain);
 
     private final SendableChooser<Command> autoChooser;
 
@@ -64,17 +66,25 @@ public class RobotContainer {
           testJoy.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id) > 1);
           
 
-        new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
-                .whileTrue(drivetrain.applyRequest(() -> brake));
+        // new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
+        //         .whileTrue(drivetrain.applyRequest(() -> brake));
 
-        new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
-                .onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        // new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+        //         .onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
-                .toggleOnTrue(new Shooter_test(m_shooter, 0.0));
+        // new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
+        //         .toggleOnTrue(new Shooter_test(m_shooter, 0.0));
 
-        new JoystickButton(testJoy, ConsController.Button.BUTTON_Y.id)
-                .whileTrue(new ShooterEasy(m_shooter,testJoy));
+
+        // new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
+        //         .toggleOnTrue(new Shoot0227(m_shooter,testJoy));
+
+        // new JoystickButton(testJoy, ConsController.Button.BUTTON_Y.id)
+        //         .toggleOnTrue(new GetFuel(m_intake));
+
+          new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
+                .toggleOnTrue(new ShooterEasy(m_shooter,testJoy));
+         
     }
 
     private void setDefaultCommand() {
@@ -90,23 +100,23 @@ public class RobotContainer {
         );
 
 
-        m_shooter.setDefaultCommand(
-                new ShooterTest(
-                        m_shooter,
-                        () -> MathUtil.applyDeadband(
-                                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-                                0.1
-                        )
-                )
-        );
+        // m_shooter.setDefaultCommand(
+        //         new ShooterTest(
+        //                 m_shooter,
+        //                 () -> MathUtil.applyDeadband(
+        //                         -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+        //                         0.1
+        //                 )
+        //         )
+        // );
 
 
-        m_intake.setDefaultCommand(
+        m_intake.setDefaultCommand( 
                 new IntakeTest(
                         m_intake,
-                        () -> driver.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id),
-                        () -> driver.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id),
-                        () -> new JoystickButton(driver, ConsController.Button.BUTTON_RB.id).getAsBoolean()
+                        () -> TT.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id),
+                        () -> TT.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id),
+                        () -> TT.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id)
                 )
         );
     }

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
@@ -22,6 +23,8 @@ public class Intake extends SubsystemBase {
   private final DutyCycleOut angleDuty = new DutyCycleOut(0);
 
   private final MotionMagicVoltage angleMM = new MotionMagicVoltage(0);
+  private final NeutralOut angleNeutral = new NeutralOut();
+
 
   public Intake() {
     haveRolling.getConfigurator().apply(ConsIntake.ROLLING_CONFIG);
@@ -66,6 +69,10 @@ public class Intake extends SubsystemBase {
 
   public double getAngleVelocityRPS() {
     return haveAngle.getVelocity().getValueAsDouble();
+  }
+
+  public void stopAngleOutput() {
+    haveAngle.setControl(angleNeutral);
   }
 
   @Override

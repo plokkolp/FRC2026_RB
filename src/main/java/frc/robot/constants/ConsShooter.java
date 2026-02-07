@@ -60,12 +60,12 @@ public final class ConsShooter {
     ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.0;
 
     ANGLE_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackRemoteSensorID = ANGLE_CANCODER_ID;
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackSensorSource   = FeedbackSensorSourceValue.FusedCANcoder;
 
-    ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 1.0;
+    ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 10.0;
     ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio =1.0;
 
     ANGLE_MOTOR_CONFIG.Slot0 = ANGLE_POS_SLOT0;
