@@ -51,7 +51,7 @@ public final class ConsShooter {
 
   private static final Slot0Configs ANGLE_POS_SLOT0 =
       new Slot0Configs()
-          .withKP(0.8)
+          .withKP(1)
           .withKI(0.0)
           .withKD(0.0);
 

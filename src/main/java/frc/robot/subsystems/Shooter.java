@@ -105,6 +105,27 @@ public class Shooter extends SubsystemBase {
     train.setControl(trainDuty);
   }
 
+// 只要 10 / 26 其中一個
+public boolean hasSpeakerTag(int tagId) {
+  return ll4.hasTag(tagId);
+}
+
+public boolean hasSpeakerTagAny() {
+  return ll4.hasSpeakerTag();
+}
+
+public double getGoalYawDegForTag(int tagId) {
+  return ll4.getGoalYawDeg(tagId);
+}
+
+public double getGoalDistanceMForTag(int tagId) {
+  return ll4.getGoalDistanceMeters(tagId);
+}
+public double getBestGoalYawDeg() {
+  return ll4.getBestGoalYawDeg();
+}
+
+
   public void stopTrain() {
     train.stopMotor();
   }

@@ -87,7 +87,11 @@ public class RobotContainer {
         //         .toggleOnTrue(new GetFuel(m_intake));
 
           new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
-                .toggleOnTrue(new ShooterEasy(m_shooter,testJoy));
+                .whileTrue(new ShooterEasy(m_shooter
+                ));
+                new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
+    .onTrue(edu.wpi.first.wpilibj2.command.Commands.print("A pressed"));
+
          
     }
 
@@ -104,15 +108,15 @@ public class RobotContainer {
         );
 
 
-        // m_shooter.setDefaultCommand(
-        //         new ShooterTest(
-        //                 m_shooter,
-        //                 () -> MathUtil.applyDeadband(
-        //                         -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-        //                         0.1
-        //                 )
-        //         )
-        // );
+        m_shooter.setDefaultCommand(
+                new ShooterTest(
+                        m_shooter,
+                        () -> MathUtil.applyDeadband(
+                                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+                                0.1
+                        )
+                )
+        );
 
 
         m_intake.setDefaultCommand( 

@@ -1,29 +1,25 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 
-public class ShooterEasy extends InstantCommand {
+public class ShooterEasy extends Command {
 
   private final Shooter shooter;
-  private final XboxController controller; 
 
+  private static final double kP = 0.0002;        // 建議先小一點
+  private static final double kMaxYawSpeed = 0.25;
+  private static final double kDeadbandDeg = 0.5;
 
-  private static final double kP = 0.008;   
-  private static final double kMaxYawSpeed = 0.02; 
-  private static final double kDeadbandDeg = 0.5;  
-
-  public ShooterEasy(Shooter shooter,XboxController testJoy) {
+  public ShooterEasy(Shooter shooter) {
     this.shooter = shooter;
-    this.controller = testJoy;
-    
-
-    addRequirements(shooter); 
+    addRequirements(shooter);
   }
+
   @Override
-    public void initialize() {
+  public void initialize() {
+    SmartDashboard.putBoolean("ShooterEasy/Active", true);
   }
 
   @Override
@@ -31,30 +27,41 @@ public class ShooterEasy extends InstantCommand {
 
     if (!shooter.hasLLTarget()) {
       shooter.setYawSpeed(0.0);
+      SmartDashboard.putString("ShooterEasy/State", "NO_LL_TARGET");
       return;
     }
 
-    double tx = shooter.getLLTx(); 
-
-    if (Math.abs(tx) < kDeadbandDeg) {
+    double errDeg = shooter.getBestGoalYawDeg();
+    if (!Double.isFinite(errDeg)) {
       shooter.setYawSpeed(0.0);
+      SmartDashboard.putString("ShooterEasy/State", "NO_VALID_GOAL");
       return;
     }
 
-    double yawCmd = -tx * kP;
+    if (Math.abs(errDeg) < kDeadbandDeg) {
+      shooter.setYawSpeed(0.0);
+      SmartDashboard.putString("ShooterEasy/State", "ALIGNED");
+      return;
+    }
 
+    double yawCmd = -errDeg * kP;
     yawCmd = Math.max(-kMaxYawSpeed, Math.min(kMaxYawSpeed, yawCmd));
-
     shooter.setYawSpeed(yawCmd);
+
+    SmartDashboard.putString("ShooterEasy/State", "TRACKING");
+    SmartDashboard.putNumber("ShooterEasy/errDeg", errDeg);
+    SmartDashboard.putNumber("ShooterEasy/yawCmd", yawCmd);
   }
 
   @Override
   public void end(boolean interrupted) {
     shooter.setYawSpeed(0.0);
+    SmartDashboard.putBoolean("ShooterEasy/Active", false);
+    SmartDashboard.putString("ShooterEasy/State", interrupted ? "INTERRUPTED" : "ENDED");
   }
 
   @Override
   public boolean isFinished() {
-    return false; 
+    return false;
   }
 }

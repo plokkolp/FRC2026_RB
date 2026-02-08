@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -10,7 +14,13 @@ import frc.robot.LimelightHelpers.RawFiducial;
 
 public class LL4 extends SubsystemBase {
 
+  /** Limelight device name (必須與 WebUI 的 Name/Hostname 一致) */
   private final String name;
+
+  // 你的目標：從 Tag 中心開始量，往後 0.58m、往上 0.70m
+  // 這是「Tag座標系」下的位移；正負號若方向不對，上機改一次即可
+  private static final double GOAL_BACK_METERS = 0.58;
+  private static final double GOAL_UP_METERS   = 0.70;
 
   public LL4() {
     this("limelight-shoot");
@@ -22,6 +32,30 @@ public class LL4 extends SubsystemBase {
     }
     this.name = name;
   }
+
+  // =========================================================
+  // Tag 過濾：只認 10 / 26
+  // =========================================================
+
+  /** 是否看到指定 tagId（用 RawFiducial） */
+  public boolean hasTag(int tagId) {
+    RawFiducial[] tags = getRawFiducials();
+    if (tags == null) return false;
+    for (RawFiducial t : tags) {
+      if (t != null && t.id == tagId) return true;
+    }
+    return false;
+  }
+
+  /** 是否看到 speaker tag（10 或 26） */
+  public boolean hasSpeakerTag() {
+    return hasTag(10) || hasTag(26);
+  }
+
+  // =========================================================
+  // A) RawFiducial 方式：距離（你原本寫的）
+  // =========================================================
+
   /** 取得「最佳」AprilTag 的直線距離(公尺)，抓不到回傳 NaN */
   public double getBestTagDistanceMeters() {
     RawFiducial[] tags = getRawFiducials();
@@ -30,7 +64,7 @@ public class LL4 extends SubsystemBase {
     RawFiducial best = null;
 
     for (RawFiducial t : tags) {
-      // 基本過濾：距離要是正常值
+      if (t == null) continue;
       if (!Double.isFinite(t.distToRobot) || t.distToRobot <= 0.0) continue;
 
       if (best == null) {
@@ -38,8 +72,7 @@ public class LL4 extends SubsystemBase {
         continue;
       }
 
-      // 選擇策略：ambiguity 越小越好
-      // 若 ambiguity 差不多，選 ta(面積)較大者
+      // ambiguity 越小越好；若差不多，ta 越大越好
       if (t.ambiguity < best.ambiguity - 1e-6) {
         best = t;
       } else if (Math.abs(t.ambiguity - best.ambiguity) <= 1e-6 && t.ta > best.ta) {
@@ -56,12 +89,97 @@ public class LL4 extends SubsystemBase {
     if (tags == null || tags.length == 0) return Double.NaN;
 
     for (RawFiducial t : tags) {
+      if (t == null) continue;
       if (t.id == tagId && Double.isFinite(t.distToRobot) && t.distToRobot > 0.0) {
         return t.distToRobot;
       }
     }
     return Double.NaN;
   }
+
+  // =========================================================
+  // B) 目標在 Tag 後方 + 上方：算「框框」的 yaw 與距離（核心）
+  //    用 Limelight 最新結果 targets_Fiducials 的 targetPose_CameraSpace
+  // =========================================================
+
+  /**
+   * 取指定 tagId 的「Tag Pose (Camera Space)」
+   * 找不到回傳 null
+   */
+  private Pose3d getTagPoseInCameraSpaceById(int tagId) {
+    LimelightHelpers.LimelightResults results = LimelightHelpers.getLatestResults(name);
+    if (results == null || results.targets_Fiducials == null) return null;
+
+    LimelightHelpers.LimelightTarget_Fiducial best = null;
+
+    for (LimelightHelpers.LimelightTarget_Fiducial t : results.targets_Fiducials) {
+      if (t == null) continue;
+      if ((int) t.fiducialID != tagId) continue;
+
+      // 用 ta 選最大（通常最穩）
+      if (best == null || t.ta > best.ta) best = t;
+    }
+
+    if (best == null) return null;
+
+    // Tag 相對相機的 3D Pose
+    return best.getTargetPose_CameraSpace();
+  }
+
+  /**
+   * 算「框框」相對相機的位置 Pose3d
+   * 找不到 tag -> 回傳 null
+   *
+   * ⚠️ Translation3d 的軸向正負號可能需要你上機確認一次：
+   *    - 若你覺得 yaw 指向反了：把 Y 取負 (0.0 -> -0.0 沒意義，需真正有左右偏移時)
+   *    - 若你覺得 “往後” 方向反了：把 -GOAL_BACK_METERS 改成 +GOAL_BACK_METERS
+   */
+  private Pose3d getGoalPoseInCameraSpace(int tagId) {
+    Pose3d tagInCam = getTagPoseInCameraSpaceById(tagId);
+    if (tagInCam == null) return null;
+
+    // 目標相對 Tag 的位移（Tag -> Goal）
+    // 你提供：往後 0.58m、往上 0.70m（左右 0）
+    Transform3d tagToGoal = new Transform3d(
+        new Translation3d(-GOAL_BACK_METERS, 0.0, GOAL_UP_METERS),
+        new Rotation3d()
+    );
+
+    return tagInCam.transformBy(tagToGoal);
+  }
+
+  /**
+   * 取得「框框」水平角（deg）：你要讓它趨近 0 的誤差角
+   * 找不到回傳 NaN
+   */
+  public double getGoalYawDeg(int tagId) {
+    Pose3d goalInCam = getGoalPoseInCameraSpace(tagId);
+    if (goalInCam == null) return Double.NaN;
+
+    double x = goalInCam.getTranslation().getX(); // forward
+    double y = goalInCam.getTranslation().getY(); // left
+
+    if (!Double.isFinite(x) || !Double.isFinite(y)) return Double.NaN;
+    if (Math.abs(x) < 1e-9) return Double.NaN;
+
+    return Math.toDegrees(Math.atan2(-y, x));
+  }
+
+  /**
+   * 取得「框框」直線距離（m）
+   * 找不到回傳 NaN
+   */
+  public double getGoalDistanceMeters(int tagId) {
+    Pose3d goalInCam = getGoalPoseInCameraSpace(tagId);
+    if (goalInCam == null) return Double.NaN;
+
+    double dist = goalInCam.getTranslation().getNorm();
+    return Double.isFinite(dist) ? dist : Double.NaN;
+  }
+
+  // =========================================================
+  // 你原本的基本方法
+  // =========================================================
 
   public boolean hasTarget() {
     return LimelightHelpers.getTV(name);
@@ -135,10 +253,30 @@ public class LL4 extends SubsystemBase {
   public void setIMUAssistAlpha(double alpha) {
     LimelightHelpers.SetIMUAssistAlpha(name, alpha);
   }
+  /** 取目前畫面中「最適合」的一顆 fiducial 的 id（用 ta 最大），沒有回 -1 */
+public int getBestFiducialId() {
+  var results = LimelightHelpers.getLatestResults(name);
+  if (results == null || results.targets_Fiducials == null) return -1;
+
+  LimelightHelpers.LimelightTarget_Fiducial best = null;
+  for (var t : results.targets_Fiducials) {
+    if (best == null || t.ta > best.ta) best = t;
+  }
+  return (best == null) ? -1 : (int) best.fiducialID;
+}
+
+/** 直接回「目前最佳 tag」對應的框框 yaw 誤差（deg），抓不到回 NaN */
+public double getBestGoalYawDeg() {
+  int id = getBestFiducialId();
+  if (id < 0) return Double.NaN;
+  return getGoalYawDeg(id);
+}
+
 
   @Override
   public void periodic() {
     SmartDashboard.putString("LL4/Name", name);
+
     SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
     SmartDashboard.putNumber("LL4/tx", getTX());
     SmartDashboard.putNumber("LL4/ty", getTY());
@@ -161,5 +299,33 @@ public class LL4 extends SubsystemBase {
     SmartDashboard.putNumber("LL4/IMU_roll", imu.Roll);
     SmartDashboard.putNumber("LL4/IMU_pitch", imu.Pitch);
     SmartDashboard.putNumber("LL4/IMU_rawYaw", imu.Yaw);
+
+    // 只認 10 / 26 的狀態
+    SmartDashboard.putBoolean("LL4/HasTag10", hasTag(10));
+    SmartDashboard.putBoolean("LL4/HasTag26", hasTag(26));
+    SmartDashboard.putBoolean("LL4/HasSpeakerTag", hasSpeakerTag());
+
+    // 方便你立即驗證：用 10 / 26 看 GoalYaw 是否合理
+    SmartDashboard.putNumber("LL4/GoalYawDeg(tag10)", getGoalYawDeg(10));
+    SmartDashboard.putNumber("LL4/GoalDistM(tag10)", getGoalDistanceMeters(10));
+    SmartDashboard.putNumber("LL4/GoalYawDeg(tag26)", getGoalYawDeg(26));
+    SmartDashboard.putNumber("LL4/GoalDistM(tag26)", getGoalDistanceMeters(26));
+
+    var r = LimelightHelpers.getLatestResults(name);
+int fidCount = (r == null || r.targets_Fiducials == null) ? 0 : r.targets_Fiducials.length;
+
+SmartDashboard.putNumber("LL4/debug/fidCount", fidCount);
+
+if (fidCount > 0) {
+  var t = r.targets_Fiducials[0];
+  SmartDashboard.putNumber("LL4/debug/fid0_id", t.fiducialID);
+  SmartDashboard.putNumber("LL4/debug/fid0_ta", t.ta);
+
+  var pose = t.getTargetPose_CameraSpace();
+  SmartDashboard.putNumber("LL4/debug/cam_x", pose.getX());
+  SmartDashboard.putNumber("LL4/debug/cam_y", pose.getY());
+  SmartDashboard.putNumber("LL4/debug/cam_z", pose.getZ());
+}
+
   }
 }
