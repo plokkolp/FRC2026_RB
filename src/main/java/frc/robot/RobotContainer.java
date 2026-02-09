@@ -83,14 +83,15 @@ public class RobotContainer {
         // new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
         //         .toggleOnTrue(new Shoot0227(m_shooter,testJoy));
 
-        // new JoystickButton(testJoy, ConsController.Button.BUTTON_Y.id)
+        // new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
         //         .toggleOnTrue(new GetFuel(m_intake));
 
-          new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
-                .whileTrue(new ShooterEasy(m_shooter
+
+          new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+                .whileTrue(new ShooterEasy(m_shooter, driver
                 ));
-                new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
-    .onTrue(edu.wpi.first.wpilibj2.command.Commands.print("A pressed"));
+//                 new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
+//     .onTrue(edu.wpi.first.wpilibj2.command.Commands.print("A pressed"));
 
          
     }
@@ -109,14 +110,16 @@ public class RobotContainer {
 
 
         m_shooter.setDefaultCommand(
-                new ShooterTest(
-                        m_shooter,
-                        () -> MathUtil.applyDeadband(
-                                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-                                0.1
-                        )
-                )
+        new Shooter_test(
+                m_shooter,
+                () -> MathUtil.applyDeadband(
+                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+                0.1
+                ),
+                () -> testJoy.getRawButton(ConsController.Button.BUTTON_Y.id) 
+        )
         );
+
 
 
         m_intake.setDefaultCommand( 

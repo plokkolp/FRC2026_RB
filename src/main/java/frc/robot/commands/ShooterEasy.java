@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
@@ -7,13 +8,17 @@ import frc.robot.subsystems.Shooter;
 public class ShooterEasy extends Command {
 
   private final Shooter shooter;
+  private final XboxController controller; 
 
-  private static final double kP = 0.0002;        // 建議先小一點
+  
+
+  private static final double kP =0.0002;        // 建議先小一點
   private static final double kMaxYawSpeed = 0.25;
   private static final double kDeadbandDeg = 0.5;
 
-  public ShooterEasy(Shooter shooter) {
+  public ShooterEasy(Shooter shooter,XboxController controller) {
     this.shooter = shooter;
+    this.controller = controller;
     addRequirements(shooter);
   }
 
@@ -24,6 +29,13 @@ public class ShooterEasy extends Command {
 
   @Override
   public void execute() {
+    shooter.setShooterSpeed(-0.63);
+    if(controller.getRightTriggerAxis() > 0.5){
+      shooter.setTrainSpeed(-0.5);
+    } else{
+       shooter.setTrainSpeed(0);
+
+    }
 
     if (!shooter.hasLLTarget()) {
       shooter.setYawSpeed(0.0);

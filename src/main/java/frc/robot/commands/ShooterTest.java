@@ -22,8 +22,8 @@ public class ShooterTest extends Command {
   public void execute() {
 
     double speed = minionSpeedSupplier.getAsDouble();
-    shooter.setShooterSpeed(speed); 
-      shooter. setTrainSpeed(-0.65); 
+    shooter.setYawAbsRot(speed/4); 
+      // shooter. setTrainSpeed(-0.65); 
   }
 
   @Override

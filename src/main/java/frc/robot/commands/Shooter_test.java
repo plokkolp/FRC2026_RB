@@ -1,27 +1,42 @@
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Shooter;
 
 public class Shooter_test extends InstantCommand {
 
   private final Shooter shooter;
-  private double targetDeg;
+  private DoubleSupplier targetDeg;
+  private final BooleanSupplier KevinDurant;
   
-  
-    public Shooter_test(Shooter shooter,double targetDeg) {
+    public Shooter_test(Shooter shooter,DoubleSupplier targetDeg, BooleanSupplier KevinDurant) {
       this.shooter = shooter;
       this.targetDeg = targetDeg;
+      this.KevinDurant = KevinDurant;
       addRequirements(shooter);
     }
   
     @Override
     public void initialize() {
-    shooter.setYawMotorPosRot(targetDeg);
   }
     @Override
   public void execute() {
-    shooter.setYawMotorPosRot(targetDeg);
+   double KD = targetDeg.getAsDouble();
+   boolean MJ = KevinDurant.getAsBoolean();
+
+   shooter.setYawSpeed(KD*0.1);
+   shooter.setShooterSpeed(-0.6);
+   if(MJ){
+      shooter.setTrainSpeed(-0.5);
+    } else{
+       shooter.setTrainSpeed(0);
+
+    }
+
   }
 
    @Override
