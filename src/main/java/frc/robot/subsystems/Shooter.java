@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
   private final TalonFX angleMotor = new TalonFX(ConsShooter.ANGLE_MOTOR_ID);   // Yaw 
   private final CANcoder angleCancoder = new CANcoder(ConsShooter.ANGLE_CANCODER_ID);
 
-  private final TalonFXS minionMotor = new TalonFXS(ConsShooter.MINION_MOTOR_ID); // Pitch
+  private final TalonFX minionMotor = new TalonFX(ConsShooter.MINION_MOTOR_ID); // Pitch
 
   private final LL4 ll4 = new LL4("limelight-shoot");
 
@@ -222,6 +222,10 @@ public double getBestGoalYawDeg() {
     return ll4.getTX(); // 水平角度，單位：degrees
   }
 
+  public double getlong(){
+    return ll4.getGoalDistanceMeters(10);
+  }
+
   @Override
   public void periodic() {
 
@@ -239,13 +243,13 @@ public double getBestGoalYawDeg() {
     SmartDashboard.putNumber("Yaw/MotorPosRot", getYawMotorPositionRot());
     // SmartDashboard.putNumber("Yaw/ClosedLoopError", getYawClosedLoopError());
 
-    // SmartDashboard.putNumber("Pitch/MotorPosRot", getPitchPositionRot());
+    SmartDashboard.putNumber("Pitch/MotorPosRot", getPitchPositionRot());
 
     // SmartDashboard.putNumber("Yaw/ShooterAngle0-360", getShooterAngle0to360Rot());        // 0~1
     // SmartDashboard.putNumber("Yaw/ShooterAngle", getShooterAngleRotContinuous());         // rot
     // SmartDashboard.putNumber("Yaw/ShooterAngleDeg0-360", getShooterAngle0to360Deg());     // 0~360 deg
     // SmartDashboard.putNumber("Yaw/ShooterAngleDeg", getShooterAngleDegContinuous());      // continuous deg
-
+ SmartDashboard.putNumber("LONG/LONG", getlong());
 
     SmartDashboard.putBoolean("LL/HasTarget", hasLLTarget());
     SmartDashboard.putNumber("LL/tx", getLLTx());

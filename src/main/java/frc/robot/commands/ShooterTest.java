@@ -22,7 +22,7 @@ public class ShooterTest extends Command {
   public void execute() {
 
     double speed = minionSpeedSupplier.getAsDouble();
-    shooter.setYawAbsRot(speed/4); 
+    shooter.setPitchSpeed(speed/4); 
       // shooter. setTrainSpeed(-0.65); 
   }
 

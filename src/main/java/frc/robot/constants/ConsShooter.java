@@ -71,7 +71,7 @@ public final class ConsShooter {
     ANGLE_MOTOR_CONFIG.Slot0 = ANGLE_POS_SLOT0;
   }
 
-  public static final TalonFXSConfiguration MINION_MOTOR_CONFIG = new TalonFXSConfiguration();
+  public static final TalonFXConfiguration MINION_MOTOR_CONFIG = new TalonFXConfiguration();
 
   private static final VoltageConfigs MINION_VOLT_LIMIT =
       new VoltageConfigs()
