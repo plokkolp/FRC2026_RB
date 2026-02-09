@@ -19,6 +19,8 @@ import frc.robot.commands.*;
 import frc.robot.constants.ConsController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -55,6 +57,8 @@ public class RobotContainer {
     public RobotContainer(Supplier<Boolean> m_isRedAlliance) {
         drivetrain.setAllianceSupplier(m_isRedAlliance);
         configureBindings();
+        
+        configureNamedCommands();
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -146,5 +150,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
+    }
+    private void configureNamedCommands() {
     }
 }
