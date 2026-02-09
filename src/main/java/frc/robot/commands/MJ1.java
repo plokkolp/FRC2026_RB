@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 
-public class MJ extends Command {
+public class MJ1 extends Command {
   private final Shooter shooter;
 
-  public MJ(Shooter shooter) {
+  public MJ1(Shooter shooter) {
     this.shooter = shooter;
 
     addRequirements(shooter);
@@ -20,7 +20,7 @@ public class MJ extends Command {
   @Override
   public void execute() {
 
-    shooter.setShooterSpeed(-0.55); 
+    shooter.setShooterSpeed(-0.5); 
     shooter.setPitchPosition(-1.6);
     shooter.setTrainSpeed(-0.6);
       }

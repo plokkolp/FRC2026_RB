@@ -105,7 +105,6 @@ public class Shooter extends SubsystemBase {
     train.setControl(trainDuty);
   }
 
-// 只要 10 / 26 其中一個
 public boolean hasSpeakerTag(int tagId) {
   return ll4.hasTag(tagId);
 }
@@ -219,12 +218,14 @@ public double getBestGoalYawDeg() {
   }
 
   public double getLLTx() {
-    return ll4.getTX(); // 水平角度，單位：degrees
+    return ll4.getTX(); //degrees
   }
 
   public double getlong(){
     return ll4.getGoalDistanceMeters(10);
   }
+
+  public int pp ;
 
   @Override
   public void periodic() {

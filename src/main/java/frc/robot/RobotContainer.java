@@ -113,16 +113,16 @@ public class RobotContainer {
         );
 
 
-        // m_shooter.setDefaultCommand(
-        // new Shooter_test(
-        //         m_shooter,
-        //         () -> MathUtil.applyDeadband(
-        //         -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-        //         0.1
-        //         ),
-        //         () -> testJoy.getRawButton(ConsController.Button.BUTTON_Y.id) 
-        // )
-        // );
+        m_shooter.setDefaultCommand(
+        new Shooter_test(
+                m_shooter,
+                () -> MathUtil.applyDeadband(
+                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+                0.1
+                ),
+                () -> testJoy.getRawButton(ConsController.Button.BUTTON_Y.id) 
+        )
+        );
 
 
 
@@ -135,15 +135,15 @@ public class RobotContainer {
                 )
         );
 
-         m_shooter.setDefaultCommand(
-        new ShooterTest(
-                m_shooter,
-                () -> MathUtil.applyDeadband(
-                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-                0.1
-                )
-        )
-        );
+        //  m_shooter.setDefaultCommand(
+        // new ShooterTest(
+        //         m_shooter,
+        //         () -> MathUtil.applyDeadband(
+        //         -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+        //         0.1
+        //         )
+        // )
+        // );
     }
 
      
@@ -152,5 +152,8 @@ public class RobotContainer {
         return autoChooser.getSelected();
     }
     private void configureNamedCommands() {
+        NamedCommands.registerCommand("Shoot",new MJ(m_shooter));
+        NamedCommands.registerCommand("Shoot1",new MJ1(m_shooter));
+
     }
 }

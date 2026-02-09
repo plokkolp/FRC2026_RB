@@ -22,7 +22,7 @@ public final class ConsShooter {
 
   private static final Slot0Configs SHOOTER_VEL_SLOT0 =
       new Slot0Configs()
-          .withKP(1.0)
+          .withKP(0.35)
           .withKI(0.00)
           .withKD(0.00)
           .withKV(0.00);
