@@ -230,55 +230,55 @@ public double getBestGoalYawDeg() {
   public void periodic() {
     SmartDashboard.putString("LL4/Name", name);
 
-    SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
-    SmartDashboard.putNumber("LL4/tx", getTX());
-    SmartDashboard.putNumber("LL4/ty", getTY());
-    SmartDashboard.putNumber("LL4/ta", getTA());
-    SmartDashboard.putNumber("LL4/txnc", getTXNC());
-    SmartDashboard.putNumber("LL4/tync", getTYNC());
-    SmartDashboard.putNumber("LL4/tagID", getTagID());
-    SmartDashboard.putNumber("LL4/heartbeat", getHeartbeat());
+//     SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
+//     SmartDashboard.putNumber("LL4/tx", getTX());
+//     SmartDashboard.putNumber("LL4/ty", getTY());
+//     SmartDashboard.putNumber("LL4/ta", getTA());
+//     SmartDashboard.putNumber("LL4/txnc", getTXNC());
+//     SmartDashboard.putNumber("LL4/tync", getTYNC());
+//     SmartDashboard.putNumber("LL4/tagID", getTagID());
+//     SmartDashboard.putNumber("LL4/heartbeat", getHeartbeat());
 
-    PoseEstimate p1 = getPoseEstimateBlue_MegaTag1();
-    SmartDashboard.putNumber("LL4/MT1_tagCount", p1.tagCount);
-    SmartDashboard.putNumber("LL4/MT1_ts", p1.timestampSeconds);
+//     PoseEstimate p1 = getPoseEstimateBlue_MegaTag1();
+//     SmartDashboard.putNumber("LL4/MT1_tagCount", p1.tagCount);
+//     SmartDashboard.putNumber("LL4/MT1_ts", p1.timestampSeconds);
 
-    PoseEstimate p2 = getPoseEstimateBlue_MegaTag2();
-    SmartDashboard.putNumber("LL4/MT2_tagCount", p2.tagCount);
-    SmartDashboard.putNumber("LL4/MT2_ts", p2.timestampSeconds);
+//     PoseEstimate p2 = getPoseEstimateBlue_MegaTag2();
+//     SmartDashboard.putNumber("LL4/MT2_tagCount", p2.tagCount);
+//     SmartDashboard.putNumber("LL4/MT2_ts", p2.timestampSeconds);
 
-    var imu = getIMU();
-    SmartDashboard.putNumber("LL4/IMU_robotYaw", imu.robotYaw);
-    SmartDashboard.putNumber("LL4/IMU_roll", imu.Roll);
-    SmartDashboard.putNumber("LL4/IMU_pitch", imu.Pitch);
-    SmartDashboard.putNumber("LL4/IMU_rawYaw", imu.Yaw);
+//     var imu = getIMU();
+//     SmartDashboard.putNumber("LL4/IMU_robotYaw", imu.robotYaw);
+//     SmartDashboard.putNumber("LL4/IMU_roll", imu.Roll);
+//     SmartDashboard.putNumber("LL4/IMU_pitch", imu.Pitch);
+//     SmartDashboard.putNumber("LL4/IMU_rawYaw", imu.Yaw);
 
-    // 只認 10 / 26 的狀態
-    SmartDashboard.putBoolean("LL4/HasTag10", hasTag(10));
-    SmartDashboard.putBoolean("LL4/HasTag26", hasTag(26));
-    SmartDashboard.putBoolean("LL4/HasSpeakerTag", hasSpeakerTag());
+//     // 只認 10 / 26 的狀態
+//     SmartDashboard.putBoolean("LL4/HasTag10", hasTag(10));
+//     SmartDashboard.putBoolean("LL4/HasTag26", hasTag(26));
+//     SmartDashboard.putBoolean("LL4/HasSpeakerTag", hasSpeakerTag());
 
-    // 方便你立即驗證：用 10 / 26 看 GoalYaw 是否合理
-    SmartDashboard.putNumber("LL4/GoalYawDeg(tag10)", getGoalYawDeg(10));
-    SmartDashboard.putNumber("LL4/GoalDistM(tag10)", getGoalDistanceMeters(10));
-    SmartDashboard.putNumber("LL4/GoalYawDeg(tag26)", getGoalYawDeg(26));
-    SmartDashboard.putNumber("LL4/GoalDistM(tag26)", getGoalDistanceMeters(26));
+//     // 方便你立即驗證：用 10 / 26 看 GoalYaw 是否合理
+//     SmartDashboard.putNumber("LL4/GoalYawDeg(tag10)", getGoalYawDeg(10));
+//     SmartDashboard.putNumber("LL4/GoalDistM(tag10)", getGoalDistanceMeters(10));
+//     SmartDashboard.putNumber("LL4/GoalYawDeg(tag26)", getGoalYawDeg(26));
+//     SmartDashboard.putNumber("LL4/GoalDistM(tag26)", getGoalDistanceMeters(26));
 
-    var r = LimelightHelpers.getLatestResults(name);
-int fidCount = (r == null || r.targets_Fiducials == null) ? 0 : r.targets_Fiducials.length;
+//     var r = LimelightHelpers.getLatestResults(name);
+// int fidCount = (r == null || r.targets_Fiducials == null) ? 0 : r.targets_Fiducials.length;
 
-SmartDashboard.putNumber("LL4/debug/fidCount", fidCount);
+// SmartDashboard.putNumber("LL4/debug/fidCount", fidCount);
 
-if (fidCount > 0) {
-  var t = r.targets_Fiducials[0];
-  SmartDashboard.putNumber("LL4/debug/fid0_id", t.fiducialID);
-  SmartDashboard.putNumber("LL4/debug/fid0_ta", t.ta);
+// if (fidCount > 0) {
+//   var t = r.targets_Fiducials[0];
+//   SmartDashboard.putNumber("LL4/debug/fid0_id", t.fiducialID);
+//   SmartDashboard.putNumber("LL4/debug/fid0_ta", t.ta);
 
-  var pose = t.getTargetPose_CameraSpace();
-  SmartDashboard.putNumber("LL4/debug/cam_x", pose.getX());
-  SmartDashboard.putNumber("LL4/debug/cam_y", pose.getY());
-  SmartDashboard.putNumber("LL4/debug/cam_z", pose.getZ());
-}
+//   var pose = t.getTargetPose_CameraSpace();
+//   SmartDashboard.putNumber("LL4/debug/cam_x", pose.getX());
+//   SmartDashboard.putNumber("LL4/debug/cam_y", pose.getY());
+//   SmartDashboard.putNumber("LL4/debug/cam_z", pose.getZ());
+// }
 
   }
 }

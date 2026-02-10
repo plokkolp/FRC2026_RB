@@ -44,7 +44,6 @@ public class Drive extends Command {
     double y = MathUtil.applyDeadband(vY.getAsDouble(), kTransDeadband);
     double omega = MathUtil.applyDeadband(vOmega.getAsDouble(), kRotDeadband);
 
-    // ★關鍵：用 drivetrain 提供的「修正過符號」的 heading
     Rotation2d heading = drivetrain.getFieldHeading();
 
     ChassisSpeeds robotSpeeds =

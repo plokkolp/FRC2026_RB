@@ -23,8 +23,9 @@ public class Shoot0227 extends Command {
   @Override
   public void execute() {
 
-    
-    shooter.setShooterSpeed(-0.92); 
+    shooter.setSpeed(-0.2);
+
+    shooter.setShooterSpeed(-0.2); 
     
   if(controller.getRightTriggerAxis() > 0.9){
     shooter.setTrainSpeed(-0.8); 

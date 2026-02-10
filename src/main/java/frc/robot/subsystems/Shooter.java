@@ -6,6 +6,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +28,9 @@ public class Shooter extends SubsystemBase {
   private final TalonFX minionMotor = new TalonFX(ConsShooter.MINION_MOTOR_ID); // Pitch
 
   private final LL4 ll4 = new LL4("limelight-shoot");
+
+ private final SparkFlex motor = new SparkFlex(51, MotorType.kBrushless);
+
 
   private final DutyCycleOut shooterDuty = new DutyCycleOut(0);
   private final DutyCycleOut trainDuty   = new DutyCycleOut(0);
@@ -222,29 +227,32 @@ public double getBestGoalYawDeg() {
   }
 
   public double getlong(){
-    return ll4.getGoalDistanceMeters(10);
+    return ll4.getGoalDistanceMeters(26);
   }
 
-  public int pp ;
+  public void setSpeed(double speed) {
+    motor.set(speed);
+    }
+
 
   @Override
   public void periodic() {
 
-    SmartDashboard.putNumber("Shooter/LeftRPM", getLeftShooterRPM());
-    SmartDashboard.putNumber("Shooter/RightRPM", getRightShooterRPM());
-    SmartDashboard.putNumber("Shooter/AvgRPM", getShooterRPM());
+    // SmartDashboard.putNumber("Shooter/LeftRPM", getLeftShooterRPM());
+    // SmartDashboard.putNumber("Shooter/RightRPM", getRightShooterRPM());
+    // SmartDashboard.putNumber("Shooter/AvgRPM", getShooterRPM());
 
-    SmartDashboard.putNumber("Shooter/LeftPosRot", getLeftShooterPositionRot());
-    SmartDashboard.putNumber("Shooter/RightPosRot", getRightShooterPositionRot());
+    // SmartDashboard.putNumber("Shooter/LeftPosRot", getLeftShooterPositionRot());
+    // SmartDashboard.putNumber("Shooter/RightPosRot", getRightShooterPositionRot());
 
-    SmartDashboard.putNumber("Train/PosRot", getTrainPositionRot());
+    // SmartDashboard.putNumber("Train/PosRot", getTrainPositionRot());
 
     // SmartDashboard.putNumber("Yaw/CAN_AbsRot", getYawCanRot());
     // SmartDashboard.putNumber("Yaw/CAN_NoOffsetRot", getYawCanNoOffsetRot());
-    SmartDashboard.putNumber("Yaw/MotorPosRot", getYawMotorPositionRot());
+    // SmartDashboard.putNumber("Yaw/MotorPosRot", getYawMotorPositionRot());
     // SmartDashboard.putNumber("Yaw/ClosedLoopError", getYawClosedLoopError());
 
-    SmartDashboard.putNumber("Pitch/MotorPosRot", getPitchPositionRot());
+    // SmartDashboard.putNumber("Pitch/MotorPosRot", getPitchPositionRot());
 
     // SmartDashboard.putNumber("Yaw/ShooterAngle0-360", getShooterAngle0to360Rot());        // 0~1
     // SmartDashboard.putNumber("Yaw/ShooterAngle", getShooterAngleRotContinuous());         // rot
@@ -252,7 +260,7 @@ public double getBestGoalYawDeg() {
     // SmartDashboard.putNumber("Yaw/ShooterAngleDeg", getShooterAngleDegContinuous());      // continuous deg
  SmartDashboard.putNumber("LONG/LONG", getlong());
 
-    SmartDashboard.putBoolean("LL/HasTarget", hasLLTarget());
-    SmartDashboard.putNumber("LL/tx", getLLTx());
+    // SmartDashboard.putBoolean("LL/HasTarget", hasLLTarget());
+    // SmartDashboard.putNumber("LL/tx", getLLTx());
   }
 }

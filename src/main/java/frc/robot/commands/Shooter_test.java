@@ -29,7 +29,7 @@ public class Shooter_test extends InstantCommand {
    boolean MJ = KevinDurant.getAsBoolean();
 
    shooter.setYawSpeed(KD*0.1);
-   shooter.setShooterRPM(3000);
+  //  shooter.setShooterRPM(3000);
    if(MJ){
       shooter.setTrainSpeed(-0.5);
     } else{

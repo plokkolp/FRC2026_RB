@@ -84,16 +84,16 @@ public class RobotContainer {
         //         .toggleOnTrue(new Shooter_test(m_shooter, 0.0));
 
 
-        // new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
-        //         .toggleOnTrue(new Shoot0227(m_shooter,testJoy));
+        new JoystickButton(operator, ConsController.Button.BUTTON_Y.id)
+                .toggleOnTrue(new ShooterEasy(m_shooter,operator));
 
-        // new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
-        //         .toggleOnTrue(new GetFuel(m_intake));
+        new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
+                .toggleOnTrue(new GetFuel(m_intake));
 
 
-          new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-                .whileTrue(new ShooterEasy(m_shooter, driver
-                ));
+        //   new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+        //         .whileTrue(new ShooterEasy(m_shooter, driver
+        //         ));
 //                 new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
 //     .onTrue(edu.wpi.first.wpilibj2.command.Commands.print("A pressed"));
 
@@ -106,8 +106,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 new Drive(
                         drivetrain,
-                        () -> +driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id) * maxSpeed,
-                        () -> -driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id) * maxSpeed,
+                        () -> -driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id) * maxSpeed,
+                        () -> +driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id) * maxSpeed,
                         () -> -driver.getRawAxis(ConsController.Axis.RIGHT_STICK_X.id) * maxAngularRate
                 )
         );

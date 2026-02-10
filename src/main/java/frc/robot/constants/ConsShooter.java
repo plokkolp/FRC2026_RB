@@ -53,7 +53,7 @@ public final class ConsShooter {
       new Slot0Configs()
           .withKP(1)
           .withKI(0.0)
-          .withKD(0.0);
+          .withKD(0.08);
 
   static {
 
