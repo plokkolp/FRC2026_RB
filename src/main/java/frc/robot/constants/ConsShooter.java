@@ -13,8 +13,11 @@ public final class ConsShooter {
 
   public static final int ANGLE_MOTOR_ID = 24;
   public static final int ANGLE_CANCODER_ID = 25;
+  public static final double YAW_MIN_ROT = -0.355;
+  public static final double YAW_MAX_ROT =  0.266846;
 
   public static final int MINION_MOTOR_ID = 20;
+
 
 
   public static final TalonFXConfiguration LEFT_SHOOTER_CONFIG  = new TalonFXConfiguration();
@@ -57,7 +60,7 @@ public final class ConsShooter {
 
   static {
 
-    ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.0;
+    ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.35;
 
     ANGLE_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

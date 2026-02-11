@@ -118,13 +118,13 @@ public boolean hasSpeakerTagAny() {
   return ll4.hasSpeakerTag();
 }
 
-public double getGoalYawDegForTag(int tagId) {
-  return ll4.getGoalYawDeg(tagId);
-}
+// public double getGoalYawDegForTag(int tagId) {
+//   return ll4.getGoalYawDeg(tagId);
+// }
 
-public double getGoalDistanceMForTag(int tagId) {
-  return ll4.getGoalDistanceMeters(tagId);
-}
+// public double getGoalDistanceMForTag(int tagId) {
+//   return ll4.getGoalDistanceMeters(tagId);
+// }
 public double getBestGoalYawDeg() {
   return ll4.getBestGoalYawDeg();
 }
@@ -226,9 +226,9 @@ public double getBestGoalYawDeg() {
     return ll4.getTX(); //degrees
   }
 
-  public double getlong(){
-    return ll4.getGoalDistanceMeters(26);
-  }
+  // public double getlong(){
+  //   return ll4.getGoalDistanceMeters(26);
+  // }
 
   public void setSpeed(double speed) {
     motor.set(speed);
@@ -258,8 +258,7 @@ public double getBestGoalYawDeg() {
     // SmartDashboard.putNumber("Yaw/ShooterAngle", getShooterAngleRotContinuous());         // rot
     // SmartDashboard.putNumber("Yaw/ShooterAngleDeg0-360", getShooterAngle0to360Deg());     // 0~360 deg
     // SmartDashboard.putNumber("Yaw/ShooterAngleDeg", getShooterAngleDegContinuous());      // continuous deg
- SmartDashboard.putNumber("LONG/LONG", getlong());
-
+//  SmartDashboard.putNumber("LONG/LONG", getlong());
     // SmartDashboard.putBoolean("LL/HasTarget", hasLLTarget());
     // SmartDashboard.putNumber("LL/tx", getLLTx());
   }
