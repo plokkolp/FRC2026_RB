@@ -1,16 +1,20 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier; 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 
 public class ShooterTest extends Command {
   private final Shooter shooter;
   private final DoubleSupplier minionSpeedSupplier; 
+  private final DoubleSupplier train; 
 
 
-  public ShooterTest(Shooter shooter, DoubleSupplier minionSpeedSupplier) {
+  public ShooterTest(Shooter shooter, DoubleSupplier minionSpeedSupplier,DoubleSupplier train) {
     this.shooter = shooter;
+    this.train = train;
     this.minionSpeedSupplier = minionSpeedSupplier;
 
     addRequirements(shooter);
@@ -20,10 +24,33 @@ public class ShooterTest extends Command {
   
   @Override
   public void execute() {
-
+    
+    double Long = shooter.getlong();
     double speed = minionSpeedSupplier.getAsDouble();
+    double trainspeed = train.getAsDouble();
+    
     shooter.setPitchSpeed(speed/4); 
-      // shooter. setTrainSpeed(-0.65); 
+    
+    if(trainspeed > 0.7){
+      shooter.setTrainSpeed(-0.6);
+      shooter.setSpeed(0.8);
+    }else{
+      shooter.setTrainSpeed(0);
+      shooter.setSpeed(0);
+
+    }
+
+    if(trainspeed > 0.1){
+    shooter.setShooterRPM(-3600);
+    }else{
+      shooter.stopShooter();
+    }
+
+    SmartDashboard.putNumber("0212/long", shooter.getlong());
+    SmartDashboard.putNumber("0212/RPM", shooter.getShooterRPM());
+    SmartDashboard.putNumber("0212/pitchRot", shooter.getPitchPositionRot());
+
+
   }
 
   @Override

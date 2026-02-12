@@ -88,7 +88,7 @@ public class RobotContainer {
                 .toggleOnTrue(new ShooterEasy(m_shooter,operator));
 
         new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
-                .toggleOnTrue(new GetFuel(m_intake));
+                .toggleOnTrue(new GetFuel(m_intake,driver));
 
 
         //   new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
@@ -114,16 +114,15 @@ public class RobotContainer {
 
 
         m_shooter.setDefaultCommand(
-        new Shooter_test(
+        new ShooterTest(
                 m_shooter,
                 () -> MathUtil.applyDeadband(
                 -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
                 0.1
                 ),
-                () -> testJoy.getRawButton(ConsController.Button.BUTTON_Y.id) 
+                () -> driver.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)
         )
         );
-
 
 
         m_intake.setDefaultCommand( 

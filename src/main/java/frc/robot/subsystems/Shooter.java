@@ -234,7 +234,11 @@ public double getBestGoalYawDeg() {
     motor.set(speed);
     }
 
+  public double getlong(){
+    return ll4.getBestTagDistanceMeters();
+  }
 
+  
   @Override
   public void periodic() {
 
