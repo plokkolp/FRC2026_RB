@@ -40,11 +40,7 @@ public class ShooterTest extends Command {
 
     }
 
-    if(trainspeed > 0.1){
-    shooter.setShooterRPM(-3100);
-    }else{
-      shooter.stopShooter();
-    }
+    
 
     SmartDashboard.putNumber("0212/long", shooter.getlong());
     SmartDashboard.putNumber("0212/RPM", shooter.getShooterRPM());
