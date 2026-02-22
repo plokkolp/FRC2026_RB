@@ -81,7 +81,7 @@ public class RobotContainer {
         //         .onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-                .toggleOnTrue(new ShooterMaster(m_shooter,driver));
+                .toggleOnTrue(new ShooterMaster(m_shooter));
 
 
         new JoystickButton(operator, ConsController.Button.BUTTON_Y.id)
