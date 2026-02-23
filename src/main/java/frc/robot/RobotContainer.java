@@ -87,7 +87,7 @@ public class RobotContainer {
 
 
         new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-                .toggleOnTrue(new ShooterMaster(m_shooter));
+                .toggleOnTrue(new ShooterAuto(m_shooter,driver));
 
         new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
                 .toggleOnTrue(new GetFuel(m_intake,driver));

@@ -13,20 +13,27 @@ public class ShooterAuto extends Command {
   private final Shooter shooter;
   private final XboxController controller;
 
+  // ===== Yaw 追蹤參數 =====
   private static final double kYawP = 0.01;
   private static final double kYawMaxOut = 0.35;
   private static final double kYawTolDeg = 1.0;
   private static final double kMaxValidTxDeg = 30.0;
 
+  // ===== 送彈設定 =====
   private static final double kTrainDuty = -0.7;
   private static final double kIntakeDuty = 0.85;
-  private static final double kFireTrig = 0.9;
+  private static final double kFireTrig = 0.3;
 
-  private static final boolean kGateByRPM = true;
+  // ===== 送彈保護（你要「按扳機就一定送」就改 false）=====
+  private static final boolean kGateByRPM = false;
   private static final double kRpmTol = 120.0;
   private static final double kSpinupMinTime = 0.2;
 
   private double startTime;
+
+  // ===== 最後一次有效 setpoint（用來 hold）=====
+  private double lastTargetRpm = 2200.0;
+  private double lastTargetPitchRot = -0.45;
 
   public ShooterAuto(Shooter shooter, XboxController controller) {
     this.shooter = shooter;
@@ -42,48 +49,53 @@ public class ShooterAuto extends Command {
   @Override
   public void execute() {
 
-    // 沒目標：至少不要送彈，Yaw停
-    if (!shooter.hasLLTarget()) {
-      shooter.setYawSpeed(0);
-      shooter.setTrainSpeed(0);
-      shooter.setIntaketrainSpeed(0);
-      SmartDashboard.putString("Auto/state", "NO_TARGET");
-      return;
+    boolean hasTarget = shooter.hasLLTarget();
+    double dist = shooter.getlong();
+
+    // ===== 1) Pitch/RPM：能更新就更新；不能更新就 hold =====
+    boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0; // 基本合理範圍
+    if (hasTarget && distValid) {
+      ShooterLookup.Point sp = ShooterLookup.sample(dist);
+      lastTargetRpm = sp.rpm;
+      lastTargetPitchRot = sp.pitchRot;
+      SmartDashboard.putString("Auto/setpointMode", "LIVE");
+    } else {
+      SmartDashboard.putString("Auto/setpointMode", "HOLD");
     }
 
-    // ===== 1) 距離查表 -> 直接取得 pitchRot（你給的就是 pitch 角度/rot）=====
-    double dist = shooter.getlong();
-    ShooterLookup.Point sp = ShooterLookup.sample(dist);
+    // 不管按不按扳機：Pitch/RPM 永遠照 setpoint 控制
+    shooter.setPitchPosition(lastTargetPitchRot);
+    shooter.setShooterRPM(lastTargetRpm);
 
-    // Pitch 用「位置」控制（閉迴路），目標就是表的第三欄
-    shooter.setPitchPosition(sp.pitchRot);
-
-    // 飛輪轉速用 RPM（閉迴路）
-    shooter.setShooterRPM(sp.rpm);
-
-    // ===== 2) Yaw 追 tx（維持你原本 ShooterMaster）=====
-    double tx = shooter.getLLTx();
-
-    if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
-      if (Math.abs(tx) > kYawTolDeg) {
-        double yawCmd = -tx * kYawP;
-        yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
-        shooter.setYawSpeed(yawCmd);
+    // ===== 2) Yaw：只有有目標才追，沒目標就停 =====
+    if (hasTarget) {
+      double tx = shooter.getLLTx();
+      if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
+        if (Math.abs(tx) > kYawTolDeg) {
+          double yawCmd = -tx * kYawP;
+          yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
+          shooter.setYawSpeed(yawCmd);
+          SmartDashboard.putNumber("Auto/yawCmd", yawCmd);
+        } else {
+          shooter.setYawSpeed(0);
+          SmartDashboard.putNumber("Auto/yawCmd", 0);
+        }
       } else {
         shooter.setYawSpeed(0);
+        SmartDashboard.putNumber("Auto/yawCmd", 0);
       }
+      SmartDashboard.putNumber("Auto/tx", tx);
     } else {
       shooter.setYawSpeed(0);
+      SmartDashboard.putNumber("Auto/tx", 999);
+      SmartDashboard.putNumber("Auto/yawCmd", 0);
     }
 
-    // ===== 3) Trigger 才送彈 =====
+    // ===== 3) 扳機：不管有沒有目標，都可以送彈 =====
     boolean trigger = controller.getRightTriggerAxis() > kFireTrig;
 
-    boolean rpmReady =
-        Math.abs(shooter.getShooterRPM() - sp.rpm) <= kRpmTol;
-
-    boolean timeReady =
-        (Timer.getFPGATimestamp() - startTime) > kSpinupMinTime;
+    boolean rpmReady = Math.abs(shooter.getShooterRPM() - lastTargetRpm) <= kRpmTol;
+    boolean timeReady = (Timer.getFPGATimestamp() - startTime) > kSpinupMinTime;
 
     boolean allowFeed = trigger;
     if (kGateByRPM) {
@@ -93,21 +105,19 @@ public class ShooterAuto extends Command {
     if (allowFeed) {
       shooter.setTrainSpeed(kTrainDuty);
       shooter.setIntaketrainSpeed(kIntakeDuty);
-      SmartDashboard.putString("Auto/state", "FEEDING");
     } else {
       shooter.setTrainSpeed(0);
       shooter.setIntaketrainSpeed(0);
-      SmartDashboard.putString("Auto/state", "AIMING");
     }
 
-    // ===== 4) Debug =====
+    // ===== Debug =====
+    SmartDashboard.putBoolean("Auto/hasTarget", hasTarget);
     SmartDashboard.putNumber("Auto/dist", dist);
-    SmartDashboard.putNumber("Auto/tx", tx);
 
-    SmartDashboard.putNumber("Auto/RPM_target", sp.rpm);
+    SmartDashboard.putNumber("Auto/RPM_target", lastTargetRpm);
     SmartDashboard.putNumber("Auto/RPM_now", shooter.getShooterRPM());
 
-    SmartDashboard.putNumber("Auto/Pitch_targetRot", sp.pitchRot);
+    SmartDashboard.putNumber("Auto/Pitch_targetRot", lastTargetPitchRot);
     SmartDashboard.putNumber("Auto/Pitch_nowRot", shooter.getPitchPositionRot());
 
     SmartDashboard.putBoolean("Auto/trigger", trigger);
@@ -121,7 +131,7 @@ public class ShooterAuto extends Command {
     shooter.setTrainSpeed(0);
     shooter.setIntaketrainSpeed(0);
     shooter.stopShooter();
-    // Pitch 通常保持位置比較好；你要停就加 shooter.stopPitch();
+    // pitch 通常保持位置；你要停就加 shooter.stopPitch();
   }
 
   @Override

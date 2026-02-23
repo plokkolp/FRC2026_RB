@@ -95,7 +95,6 @@ public final class ConsShooter {
 
     MINION_MOTOR_CONFIG.Slot0 = MINION_POS_SLOT0;
   }
-  
 
   private ConsShooter() {}
 }
