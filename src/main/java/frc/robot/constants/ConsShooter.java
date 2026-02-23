@@ -25,11 +25,11 @@ public final class ConsShooter {
 
  private static final Slot0Configs SHOOTER_VEL_SLOT0 =
     new Slot0Configs()
-        .withKS(0.20)    // 先給小摩擦補償(Volt)，0.10~0.40 可試
-        .withKV(0.12)    // 先給速度前饋(Volt/RPS)，0.10~0.18 可試
-        .withKP(0.50)    // 先小一點，避免震盪
+        .withKS(0.15)    // 先給小摩擦補償(Volt)，0.10~0.40 可試
+        .withKV(0.16)    // 先給速度前饋(Volt/RPS)，0.10~0.18 可試
+        .withKP(0.40)    // 先小一點，避免震盪
         .withKI(0.00)     //哇 Chao
-        .withKD(0.00);   // 先不加D，穩了再加 0.0~0.1 量級
+        .withKD(0.0);   // 先不加D，穩了再加 0.0~0.1 量級
 
 
   static {
@@ -95,6 +95,7 @@ public final class ConsShooter {
 
     MINION_MOTOR_CONFIG.Slot0 = MINION_POS_SLOT0;
   }
+  
 
   private ConsShooter() {}
 }

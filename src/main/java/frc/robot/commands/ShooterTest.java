@@ -29,14 +29,20 @@ public class ShooterTest extends Command {
     double speed = minionSpeedSupplier.getAsDouble();
     double trainspeed = train.getAsDouble();
     
-    shooter.setPitchSpeed(speed/10); 
+    shooter.setPitchSpeed(speed/35); 
     
     if(trainspeed > 0.7){
-      shooter.setTrainSpeed(-0.6);
-      shooter.setIntaketrainSpeed(0.8);
-    }else{
+      shooter.setTrainSpeed(-0.7);
+      shooter.setIntaketrainSpeed(0.85);
+
+    }else if(trainspeed > 0.25){
+    shooter.setShooterRPM(2600);
+
+    }
+      else{
       shooter.setTrainSpeed(0);
       shooter.setIntaketrainSpeed(0);
+      shooter.stopShooter();
 
     }
 

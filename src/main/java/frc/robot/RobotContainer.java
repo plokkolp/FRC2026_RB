@@ -33,8 +33,8 @@ public class RobotContainer {
             RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
     private final XboxController driver   = new XboxController(ConsController.kDriveControllerPort);      
-    private final XboxController testJoy  = new XboxController(3);                                       
-    private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);  
+    private final XboxController testJoy  = new XboxController(1);                                       
+//     private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);  
     private final XboxController TT  = new XboxController(4);                                       
 
 
@@ -87,7 +87,7 @@ public class RobotContainer {
 
 
         new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-                .toggleOnTrue(new Shoot0227(m_shooter,driver));
+                .toggleOnTrue(new ShooterMaster(m_shooter));
 
         new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
                 .toggleOnTrue(new GetFuel(m_intake,driver));
@@ -125,16 +125,16 @@ public class RobotContainer {
 
     
 
-        // m_shooter.setDefaultCommand(
-        // new ShooterTest(
-        //         m_shooter,
-        //         () -> MathUtil.applyDeadband(
-        //         -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-        //         0.1
-        //         ),
-        //         () -> driver.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)
-        // )
-        // );
+        m_shooter.setDefaultCommand(
+        new ShooterTest(
+                m_shooter,
+                () -> MathUtil.applyDeadband(
+                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+                0.1
+                ),
+                () -> testJoy.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)
+        )
+        );
 
 
         m_intake.setDefaultCommand( 

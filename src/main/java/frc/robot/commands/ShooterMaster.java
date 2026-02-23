@@ -11,7 +11,7 @@ public class ShooterMaster extends Command {
 
   private static final double kP = 0.01;
   private static final double kS = 0.0;
-  private static final double kMaxOut = 0.25;
+  private static final double kMaxOut = 0.35;
   private static final double kTolDeg = 1.0;
   private static final double kMaxValidTxDeg = 30.0;
  
