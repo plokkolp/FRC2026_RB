@@ -33,8 +33,8 @@ public class RobotContainer {
             RotationsPerSecond.of(0.75).in(RadiansPerSecond);
 
     private final XboxController driver   = new XboxController(ConsController.kDriveControllerPort);      
-    private final XboxController testJoy  = new XboxController(1);                                       
-//     private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);  
+    private final XboxController testJoy  = new XboxController(3);                                       
+    private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);  
     private final XboxController TT  = new XboxController(4);                                       
 
 
@@ -90,7 +90,7 @@ public class RobotContainer {
                 .toggleOnTrue(new ShooterAuto(m_shooter,driver));
 
         new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
-                .toggleOnTrue(new GetFuel(m_intake,driver));
+                .toggleOnTrue(new TeleGetFuel(m_intake));
 
 
         //   new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)

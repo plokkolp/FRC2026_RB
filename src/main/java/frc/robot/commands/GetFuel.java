@@ -24,39 +24,28 @@ public class GetFuel extends Command {
    
      @Override
      public void initialize() {
-        down = false; end = false; unrolling = false;
        double currentPos = intake.getAnglePositionRot(); 
    
        if (Math.abs(currentPos - POS_DOWN) < TOLERANCE) {
          intake.setAnglePositionRot(POS_UP);
-         rolling = false;
     }
     else {
       intake.setAnglePositionRot(POS_DOWN);
-      rolling = true;
      
     }
   }
 
 @Override
   public void execute() {
-   
-
-    if(rolling){
-        intake.setRolling(1);
-    }else{
-         intake.setRolling(0);
-    }
   
+    if (Math.abs(intake.getAnglePositionRot() - POS_DOWN) < TOLERANCE) {
+         
+      intake.setRolling(0.9);
+  }
 
-  if(rolling && driver.getRightTriggerAxis()  > 0.1){
-        rolling = false;
-        unrolling = true;
-                intake.setRolling(-1);
-
-  }else if(unrolling = driver.getRightTriggerAxis()  < 0.1){
-        rolling = true;
-        unrolling = false;
+  if(driver.getAButton()){
+      
+    intake.setAnglePositionRot(POS_UP);
   }
 
   }

@@ -71,8 +71,8 @@ public class Intake extends SubsystemBase {
     return haveAngle.getVelocity().getValueAsDouble();
   }
 
-  public void stopAngleOutput() {
-    haveAngle.setControl(angleNeutral);
+  public void stopAngle() {
+    haveAngle.stopMotor();
   }
 
   

@@ -36,7 +36,7 @@ public class ShooterTest extends Command {
       shooter.setIntaketrainSpeed(0.85);
 
     }else if(trainspeed > 0.25){
-    shooter.setShooterRPM(2600);
+    shooter.setShooterRPM(3050);
 
     }
       else{

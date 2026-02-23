@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
   private double lastSeenTimeSec = 0.0;
 
   private static final double kTxAlpha = 0.5;        // 越大越快 (0~1)
-  private static final double kHoldTimeoutSec = 0.20; // 沒看到目標最多保留多久
+  private static final double kHoldTimeoutSec = 0.25; // 沒看到目標最多保留多久
   private static final double kMaxAbsTxDeg = 35.0;    // 避免爆值
 
   public Shooter() {

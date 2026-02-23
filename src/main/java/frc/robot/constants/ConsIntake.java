@@ -35,9 +35,11 @@ public final class ConsIntake {
         .withInverted(InvertedValue.CounterClockwise_Positive);
 
     ANGLE_CONFIG.Slot0 = new Slot0Configs()
-        .withKP(3)
-        .withKI(0)
-        .withKD(0.5);
+    .withKP(0.8)
+    .withKI(0);
+    // .withKD(0.5)
+    // .withKS(0.4)   
+    // .withKG(0.4);
 
     ANGLE_CONFIG.MotionMagic = new MotionMagicConfigs()
         .withMotionMagicCruiseVelocity(20)
