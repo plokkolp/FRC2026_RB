@@ -17,10 +17,9 @@ public class Drive extends Command {
   private final CommandSwerveDrivetrain drivetrain;
   private final DoubleSupplier vX, vY, vOmega;
 
-  private static final double kTransDeadband = 0.1;
+  private static final double kTransDeadband = 0.01;
   private static final double kRotDeadband   = 0.10;
 
-  // ★改用 ApplyRobotSpeeds：我們自己做 Field->Robot 轉換
   private final SwerveRequest.ApplyRobotSpeeds driveRequest =
       new SwerveRequest.ApplyRobotSpeeds()
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);

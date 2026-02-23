@@ -33,10 +33,10 @@ public class ShooterTest extends Command {
     
     if(trainspeed > 0.7){
       shooter.setTrainSpeed(-0.6);
-      shooter.setSpeed(0.8);
+      shooter.setIntaketrainSpeed(0.8);
     }else{
       shooter.setTrainSpeed(0);
-      shooter.setSpeed(0);
+      shooter.setIntaketrainSpeed(0);
 
     }
 

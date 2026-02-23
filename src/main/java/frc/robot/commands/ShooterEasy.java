@@ -35,10 +35,10 @@ public class ShooterEasy extends Command {
 
     shooter.setShooterSpeed(-0.55);//-0.63
     if (controller.getRightTriggerAxis() > 0.5) {
-      shooter.setSpeed(-0.2);
+      shooter.setIntaketrainSpeed(-0.2);
       shooter.setTrainSpeed(-0.5);
     } else {
-      shooter.setSpeed(0);
+      shooter.setIntaketrainSpeed(0);
       shooter.setTrainSpeed(0.0);
     }
 

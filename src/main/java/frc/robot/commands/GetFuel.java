@@ -9,7 +9,7 @@ public class GetFuel extends Command {
   private final Intake intake;
   private final XboxController driver;
 
-  private static final double POS_DOWN = 13.2;
+  private static final double POS_DOWN = 15.17;
   private static final double POS_UP   = 0.0;
 
   private static final double TOLERANCE = 0.5;

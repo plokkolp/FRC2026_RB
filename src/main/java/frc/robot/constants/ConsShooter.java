@@ -6,10 +6,10 @@ import com.ctre.phoenix6.signals.*;
 public final class ConsShooter {
 
 
-  public static final int LEFT_SHOOTER_ID = 21;
-  public static final int RIGHT_SHOOTER_ID = 22;
+  public static final int LEFT_SHOOTER_ID = 22;
+  public static final int RIGHT_SHOOTER_ID = 23;
 
-  public static final int TRAIN_ID = 23;
+  public static final int TRAIN_ID = 21;
 
   public static final int ANGLE_MOTOR_ID = 24;
   public static final int ANGLE_CANCODER_ID = 25;

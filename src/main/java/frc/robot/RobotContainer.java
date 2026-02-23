@@ -51,6 +51,8 @@ public class RobotContainer {
 
     private final SwerveRequest.SwerveDriveBrake brake =
             new SwerveRequest.SwerveDriveBrake();
+        private final SwerveRequest.FieldCentric fieldCentric =
+                new SwerveRequest.FieldCentric();
     private final SwerveRequest.Idle idle =
             new SwerveRequest.Idle();
 
@@ -80,12 +82,12 @@ public class RobotContainer {
         // new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
         //         .onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
+        // new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+        //         .toggleOnTrue(new ShooterMaster(m_shooter));
+
+
         new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-                .toggleOnTrue(new ShooterMaster(m_shooter));
-
-
-        new JoystickButton(operator, ConsController.Button.BUTTON_Y.id)
-                .toggleOnTrue(new ShooterEasy(m_shooter,operator));
+                .toggleOnTrue(new Shoot0227(m_shooter,driver));
 
         new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
                 .toggleOnTrue(new GetFuel(m_intake,driver));
@@ -103,26 +105,36 @@ public class RobotContainer {
     private void setDefaultCommand() {
 
 
+        // drivetrain.setDefaultCommand(
+        //         new Drive(
+        //                 drivetrain,
+        //                 () -> -driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id) * maxSpeed,
+        //                 () -> +driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id) * maxSpeed,
+        //                 () -> -driver.getRawAxis(ConsController.Axis.RIGHT_STICK_X.id) * maxAngularRate
+        //         )
+        // );
         drivetrain.setDefaultCommand(
-                new Drive(
-                        drivetrain,
-                        () -> -driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id) * maxSpeed,
-                        () -> +driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id) * maxSpeed,
-                        () -> -driver.getRawAxis(ConsController.Axis.RIGHT_STICK_X.id) * maxAngularRate
-                )
-        );
-
-
-        m_shooter.setDefaultCommand(
-        new ShooterTest(
-                m_shooter,
-                () -> MathUtil.applyDeadband(
-                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-                0.1
-                ),
-                () -> driver.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)
+                new Drive(                                                           
+                         drivetrain,
+                        () -> MathUtil.applyDeadband(-driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id),0.06),
+                        () -> MathUtil.applyDeadband(+driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id),0.06),
+                        () -> MathUtil.applyDeadband(-driver.getRawAxis(ConsController.Axis.RIGHT_STICK_X.id),0.06)
         )
-        );
+    );
+    
+
+    
+
+        // m_shooter.setDefaultCommand(
+        // new ShooterTest(
+        //         m_shooter,
+        //         () -> MathUtil.applyDeadband(
+        //         -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+        //         0.1
+        //         ),
+        //         () -> driver.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)
+        // )
+        // );
 
 
         m_intake.setDefaultCommand( 

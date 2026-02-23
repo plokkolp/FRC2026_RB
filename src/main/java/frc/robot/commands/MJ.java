@@ -19,7 +19,7 @@ public class MJ extends Command {
   
   @Override
   public void execute() {
-    shooter.setSpeed(-0.4);
+    shooter.setIntaketrainSpeed(-0.4);
     shooter.setShooterSpeed(-0.56); //6
     shooter.setPitchPosition(-1.6);
     shooter.setTrainSpeed(-0.6);

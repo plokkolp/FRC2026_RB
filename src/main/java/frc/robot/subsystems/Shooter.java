@@ -213,6 +213,11 @@ public class Shooter extends SubsystemBase {
     stopPitch();
   }
 
+  public void setAllTrainSpeed(double speed){
+    setTrainSpeed(speed);
+    setIntaketrainSpeed(speed);
+  }
+
   public boolean hasLLTarget() {
     return ll4.hasTarget();
   }
@@ -225,13 +230,15 @@ public class Shooter extends SubsystemBase {
     return txFilteredDeg; // degrees (filtered + hold)
   }
 
-  public void setSpeed(double speed) {
+  public void setIntaketrainSpeed(double speed) {
     motor.set(speed);
   }
 
   public double getlong() {
     return ll4.getBestTagDistanceMeters();
   }
+
+  
 
   @Override
   public void periodic() {
@@ -245,14 +252,14 @@ public class Shooter extends SubsystemBase {
       lastSeenTimeSec = now;
       txEverValid = true;
 
-      // 快速 EMA：越大越快追上
+      //遠快追
       txFilteredDeg = (1.0 - kTxAlpha) * txFilteredDeg + kTxAlpha * rawTx;
     } else {
-      // 沒看到目標：短時間內保持上一筆（避免燈光造成跳變）
+      //跳變
       if (txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec) {
         // keep txFilteredDeg
       } else {
-        txFilteredDeg = 0.0; // 超時就歸零，避免拿舊角度一直轉
+        txFilteredDeg = 0.0; //超時歸零
       }
     }
 
@@ -260,7 +267,6 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("LL/tx_filtered", txFilteredDeg);
     SmartDashboard.putBoolean("LL/tx_hold_active",
         txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec);
-    // ===========================================================================
 
   }
 }

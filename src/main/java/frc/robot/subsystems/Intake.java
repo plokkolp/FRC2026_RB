@@ -75,6 +75,8 @@ public class Intake extends SubsystemBase {
     haveAngle.setControl(angleNeutral);
   }
 
+  
+
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Intake/AnglePosRot", getAnglePositionRot());
