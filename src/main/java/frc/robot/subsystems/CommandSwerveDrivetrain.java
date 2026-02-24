@@ -101,12 +101,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
+  // ===== Debug =====
   private int m_resetPoseCount = 0;
 
   // =========================
-  // 重要：WPILib kinematics/odometry 座標系
-  // +X 向前、+Y 向左
-  // 你原本把 +Y 寫成右邊，會導致里程計/角度怪
+  // WPILib kinematics/odometry：+X 前、+Y 左
   // =========================
   private static final Translation2d kFL =
       new Translation2d(Units.inchesToMeters(+14.75), Units.inchesToMeters(+12.75));
@@ -172,26 +171,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     this.m_allianceSupplier = allianceSupplier;
   }
 
-  // =========================
-  // 里程計角度（你要的「加負號」就在這裡）
-  // WPILib 慣例：逆時針(CCW)為正
-  // 常見 Pigeon2：順時針為正 -> 這裡反號一次統一
-  // =========================
-  private Rotation2d getOdometryHeading() {
+  public Rotation2d getOdomHeading() {
     return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
   }
 
-  // 給手控 FieldRelative 用（跟里程計同一套）
-  public Rotation2d getFieldHeading() {
-    return getOdometryHeading();
+  public Rotation2d getTeleopHeading() {
+    return getOdomHeading();
   }
 
-  // RobotContainer 的 LB 建議呼叫這個
+  // 舊名保留（避免你其他地方還在呼叫）
+  public Rotation2d getFieldHeading() {
+    return getTeleopHeading();
+  }
+
+  // =========================
+  // 歸零：gyro 歸零 + estimator 同步
+  // =========================
   public void seedFieldCentric() {
     getPigeon2().setYaw(0);
+
     Pose2d cur = getPose();
     m_poseEstimator.resetPosition(
-        getOdometryHeading(),
+        getOdomHeading(),
         getState().ModulePositions,
         new Pose2d(cur.getTranslation(), Rotation2d.fromDegrees(0)));
   }
@@ -199,12 +200,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void autoSeedFieldCentric() {
     double angle = (m_allianceSupplier != null && m_allianceSupplier.get()) ? 180.0 : 0.0;
 
-    // 因為 getOdometryHeading() 會反號，所以 setYaw 也反號一次讓「里程計角度」變成 angle
+    // 因為 getOdomHeading() 會反號，所以 setYaw 也反號一次
     getPigeon2().setYaw(-angle);
 
     Pose2d cur = getPose();
     Pose2d target = new Pose2d(cur.getTranslation(), Rotation2d.fromDegrees(angle));
-    m_poseEstimator.resetPosition(getOdometryHeading(), getState().ModulePositions, target);
+    m_poseEstimator.resetPosition(getOdomHeading(), getState().ModulePositions, target);
   }
 
   private void configurePathPlanner() {
@@ -220,7 +221,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         this::getPose,
         this::resetPose,
         this::getRobotRelativeSpeeds,
-        speeds -> setControl(m_pathApply.withSpeeds(speeds)), // PathPlanner 輸出是 robot-relative，別再轉換
+        speeds -> setControl(m_pathApply.withSpeeds(speeds)), // PP 輸出是 robot-relative，別再轉一次
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
             new PIDConstants(5.0, 0.0, 0.0)),
@@ -231,11 +232,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   @Override
   public void periodic() {
-    // 用「真陀螺儀角度(含負號修正)」更新里程計
-    m_poseEstimator.update(getOdometryHeading(), getState().ModulePositions);
+    // 里程計更新：永遠用乾淨 odom heading
+    m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
     SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
-    SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdometryHeading().getDegrees());
+    SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
+    SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
     SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
     SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
@@ -266,8 +268,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
     SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
 
-    // 只重設 estimator，避免兩套里程計互打
-    m_poseEstimator.resetPosition(getOdometryHeading(), getState().ModulePositions, pose);
+    // 只重設 estimator（保持乾淨），不要再 super.resetPose() 造成雙里程計互打
+    m_poseEstimator.resetPosition(getOdomHeading(), getState().ModulePositions, pose);
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {

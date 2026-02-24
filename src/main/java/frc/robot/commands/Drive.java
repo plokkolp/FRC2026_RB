@@ -56,7 +56,7 @@ public class Drive extends Command {
     double yMps = yInput * maxSpeedMps;
     double omegaRadPerSec = omegaInput * kMaxOmegaRadPerSec;
 
-    Rotation2d heading = drivetrain.getFieldHeading();
+Rotation2d heading = drivetrain.getTeleopHeading();
 
     ChassisSpeeds robotSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
