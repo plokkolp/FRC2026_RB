@@ -24,22 +24,21 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 public class Vision extends SubsystemBase {
 
   private static final String kLeftName = "Left";
   private static final String kRightName = "Right";
 
-  //+X 前 +Y 左 +Z 上
+  // +X 前 +Y 左 +Z 上
   private static final Transform3d kRobotToLeftCam =
       new Transform3d(
-          new Translation3d(0.25, 0.20, 0.30),
-          new Rotation3d(0.0, Math.toRadians(-10), Math.toRadians(0)));
+          new Translation3d(0.75, 0.16, 0.30),
+          new Rotation3d(0.0, Math.toRadians(-25), Math.toRadians(0)));
 
   private static final Transform3d kRobotToRightCam =
       new Transform3d(
-          new Translation3d(0.25, -0.20, 0.30),
-          new Rotation3d(0.0, Math.toRadians(-10), Math.toRadians(0)));
+          new Translation3d(0, 0, 0),
+          new Rotation3d(0.0, Math.toRadians(0), Math.toRadians(0)));
 
   // ===== Gate 參數 =====
   private static final int kMinTagsForMultiTag = 2;
@@ -48,12 +47,11 @@ public class Vision extends SubsystemBase {
   private static final double kDualMaxPoseDeltaM = 0.35;
   private static final double kDualMaxYawDeltaDeg = 12.0;
 
-  //1tag
-  private static final double kSingleTagMaxDistM = 3.0;
-  private static final double kSingleTagMaxAmb = 0.08;
-  private static final double kSingleTagMaxJumpM = 0.25;
+  // 1-tag（你要單鏡頭單Tag也更新：所以只保留品質門檻，不再當成 fallback）
+  private static final double kSingleTagMaxDistM = 3.5; // 原本 3.0，稍微放寬一點避免太容易斷
+  private static final double kSingleTagMaxAmb = 0.15;  // 原本 0.08，稍微放寬；太嚴會很常拒絕
 
-  private static final double kRejectJumpMeters = 1.5;
+  // Candidate 基本品質拒絕（只看 vision 本身品質，不看跟里程計差多少）
   private static final double kRejectAvgDist = 7.0;
   private static final double kRejectAvgAmb = 0.40;
 
@@ -64,6 +62,10 @@ public class Vision extends SubsystemBase {
   private final PhotonPoseEstimator rightEstimator;
 
   private final CommandSwerveDrivetrain drivetrain;
+
+  // ===== 第一次雙Tag：無條件硬切 Pose =====
+  private boolean hasHardSeededPose = false;
+  private double hardSeedTs = -1.0;
 
   public Vision(CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
@@ -104,7 +106,6 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    // 連線狀態：只接一顆時會很有用
     SmartDashboard.putBoolean("Vision/LeftConnected", leftCam.isConnected());
     SmartDashboard.putBoolean("Vision/RightConnected", rightCam.isConnected());
 
@@ -117,17 +118,19 @@ public class Vision extends SubsystemBase {
     Optional<Candidate> left = getCandidate(leftCam, leftEstimator, odo);
     Optional<Candidate> right = getCandidate(rightCam, rightEstimator, odo);
 
-    // 1) MultiTag：任一鏡頭達標就融合
+    // 1) MultiTag：任一鏡頭達標就更新（第一次雙Tag無條件 resetPose）
     if (left.isPresent() && left.get().tagCount >= kMinTagsForMultiTag) {
+      hardSeedPoseOnce(left.get(), "HARDSEED_LEFT_MULTITAG");
       fuse(left.get(), "LEFT_MULTITAG");
       return;
     }
     if (right.isPresent() && right.get().tagCount >= kMinTagsForMultiTag) {
+      hardSeedPoseOnce(right.get(), "HARDSEED_RIGHT_MULTITAG");
       fuse(right.get(), "RIGHT_MULTITAG");
       return;
     }
 
-    // 2) 雙鏡頭同一Tag：兩邊都要有
+    // 2) 雙鏡頭同一Tag：兩邊都要有（保留你原本的保護條件）
     if (left.isPresent() && right.isPresent()) {
       Candidate L = left.get();
       Candidate R = right.get();
@@ -154,13 +157,14 @@ public class Vision extends SubsystemBase {
       }
     }
 
-    // 3) 單鏡頭 1-tag fallback（保守）
-    if (left.isPresent() && isSingleTagFallbackOK(left.get())) {
-      fuse(left.get(), "LEFT_SINGLE_FALLBACK");
+    // 3) ★你要的：單鏡頭單Tag也更新（不再當 fallback，而是正常更新）
+    //    規則：只要 candidate 有、且單Tag品質 OK，就直接 fuse
+    if (left.isPresent() && isSingleTagOK(left.get())) {
+      fuse(left.get(), "LEFT_SINGLE_TAG");
       return;
     }
-    if (right.isPresent() && isSingleTagFallbackOK(right.get())) {
-      fuse(right.get(), "RIGHT_SINGLE_FALLBACK");
+    if (right.isPresent() && isSingleTagOK(right.get())) {
+      fuse(right.get(), "RIGHT_SINGLE_TAG");
       return;
     }
 
@@ -175,7 +179,7 @@ public class Vision extends SubsystemBase {
     final int bestFid;
     final double avgAmb;
     final double avgDist;
-    final double jumpMeters;
+    final double jumpMeters; // debug only
 
     Candidate(
         String camName,
@@ -206,7 +210,6 @@ public class Vision extends SubsystemBase {
       return Optional.empty();
     }
 
-    // ★ 你的版本：update(PhotonPipelineResult)
     Optional<EstimatedRobotPose> opt = estimator.update(result);
     if (opt.isEmpty()) {
       SmartDashboard.putString("Vision/" + cam.getName(), "NO_POSE");
@@ -215,8 +218,6 @@ public class Vision extends SubsystemBase {
 
     EstimatedRobotPose erp = opt.get();
     Pose2d pose = erp.estimatedPose.toPose2d();
-
-    // ★ 你的版本：result timestamp 可用
     double ts = result.getTimestampSeconds();
 
     int tagCount = erp.targetsUsed.size();
@@ -241,16 +242,15 @@ public class Vision extends SubsystemBase {
 
     double jumpMeters = odoPose.getTranslation().getDistance(pose.getTranslation());
 
-    // 基本拒絕：太遠 / 太跳 / 太不確定
-    if (jumpMeters > kRejectJumpMeters || avgDist > kRejectAvgDist || avgAmb > kRejectAvgAmb) {
-      SmartDashboard.putString("Vision/" + cam.getName(), "CAND_REJECT_BASIC");
+    // 只看 vision 自己的品質：太遠 / 太不確定就拒絕
+    if (avgDist > kRejectAvgDist || avgAmb > kRejectAvgAmb) {
+      SmartDashboard.putString("Vision/" + cam.getName(), "CAND_REJECT_QUALITY");
       SmartDashboard.putNumber("Vision/" + cam.getName() + "/jumpM", jumpMeters);
       SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgAmb", avgAmb);
       SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgDist", avgDist);
       return Optional.empty();
     }
 
-    // Debug
     SmartDashboard.putString("Vision/" + cam.getName(), "CAND_OK");
     SmartDashboard.putNumber("Vision/" + cam.getName() + "/tags", tagCount);
     SmartDashboard.putNumber("Vision/" + cam.getName() + "/bestFid", bestFid);
@@ -263,11 +263,11 @@ public class Vision extends SubsystemBase {
         new Candidate(cam.getName(), pose, ts, tagCount, bestFid, avgAmb, avgDist, jumpMeters));
   }
 
-  private boolean isSingleTagFallbackOK(Candidate c) {
+  // ★單Tag也更新：這就是單Tag的品質門檻
+  private boolean isSingleTagOK(Candidate c) {
     if (c.tagCount != 1) return false;
     if (c.avgDist >= kSingleTagMaxDistM) return false;
     if (c.avgAmb >= kSingleTagMaxAmb) return false;
-    if (c.jumpMeters >= kSingleTagMaxJumpM) return false;
     return true;
   }
 
@@ -277,16 +277,33 @@ public class Vision extends SubsystemBase {
     return (a.avgDist < b.avgDist) ? a : b;
   }
 
+  // 第一次雙Tag無條件硬切 pose（只做一次）
+  private void hardSeedPoseOnce(Candidate c, String reason) {
+    if (hasHardSeededPose) return;
+
+    drivetrain.resetPose(c.pose);
+
+    hasHardSeededPose = true;
+    hardSeedTs = Timer.getFPGATimestamp();
+
+    SmartDashboard.putString("Vision/HardSeed/Reason", reason);
+    SmartDashboard.putNumber("Vision/HardSeed/ts", hardSeedTs);
+    SmartDashboard.putNumber("Vision/HardSeed/X", c.pose.getX());
+    SmartDashboard.putNumber("Vision/HardSeed/Y", c.pose.getY());
+    SmartDashboard.putNumber("Vision/HardSeed/Deg", c.pose.getRotation().getDegrees());
+  }
+
   private void fuse(Candidate c, String reason) {
 
-    double sx = 0.07;
-    double sy = 0.07;
-    double st = Math.toRadians(4.0);
+    // 多Tag更信任，單Tag更保守（但仍然更新）
+    double sx = 0.05;
+    double sy = 0.05;
+    double st = Math.toRadians(3.0);
 
     if (c.tagCount <= 1) {
-      sx *= 2.5;
-      sy *= 2.5;
-      st *= 2.5;
+      sx *= 3.0;
+      sy *= 3.0;
+      st *= 3.0;
     }
 
     double ambScale = 1.0 + 2.0 * clamp(c.avgAmb, 0.0, 0.6) / 0.6;
@@ -305,7 +322,6 @@ public class Vision extends SubsystemBase {
     SmartDashboard.putNumber("Vision/Fused/bestFid", c.bestFid);
     SmartDashboard.putNumber("Vision/Fused/timestampAge", Timer.getFPGATimestamp() - c.timestamp);
     SmartDashboard.putNumber("Vision/Fused/stdX", sx);
-    SmartDashboard.putNumber("Vision/Fused/stdY", sy);
     SmartDashboard.putNumber("Vision/Fused/stdY", sy);
     SmartDashboard.putNumber("Vision/Fused/stdThetaDeg", Math.toDegrees(st));
   }

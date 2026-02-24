@@ -45,7 +45,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain =
             TunerConstants.createDrivetrain();
 
-//     private final Vision vision = new Vision(drivetrain);
+    private final Vision vision = new Vision(drivetrain);
 
     private final SendableChooser<Command> autoChooser;
 
