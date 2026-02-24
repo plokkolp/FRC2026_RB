@@ -16,11 +16,17 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -44,16 +50,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private Supplier<Boolean> m_allianceSupplier;
 
   private final SwerveRequest.ApplyRobotSpeeds m_pathApply = new SwerveRequest.ApplyRobotSpeeds();
-
   private final Field2d field = new Field2d();
 
   // ===== SysId =====
   private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
       new SwerveRequest.SysIdSwerveTranslation();
-
   private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization =
       new SwerveRequest.SysIdSwerveSteerGains();
-
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
 
@@ -98,8 +101,38 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
-  // ===== Debug =====
   private int m_resetPoseCount = 0;
+
+  private static final Translation2d kFL =
+      new Translation2d(Units.inchesToMeters(+14.75), Units.inchesToMeters(-12.75));
+  private static final Translation2d kFR =
+      new Translation2d(Units.inchesToMeters(+14.75), Units.inchesToMeters(+12.75));
+  private static final Translation2d kBL =
+      new Translation2d(Units.inchesToMeters(-14.75), Units.inchesToMeters(-12.75));
+  private static final Translation2d kBR =
+      new Translation2d(Units.inchesToMeters(-14.75), Units.inchesToMeters(+12.75));
+
+  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(kFL, kFR, kBL, kBR);
+
+  private static final Matrix<N3, N1> kStateStdDevs =
+      VecBuilder.fill(0.25, 0.25, Math.toRadians(8.0));
+
+  private static final Matrix<N3, N1> kVisionStdDevs =
+      VecBuilder.fill(0.08, 0.08, Math.toRadians(4.0));
+
+  private final SwerveDrivePoseEstimator m_poseEstimator =
+      new SwerveDrivePoseEstimator(
+          m_kinematics,
+          Rotation2d.fromDegrees(0),
+          new SwerveModulePosition[] {
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition(),
+              new SwerveModulePosition()
+          },
+          new Pose2d(),
+          kStateStdDevs,
+          kVisionStdDevs);
 
   public CommandSwerveDrivetrain(
       SwerveDrivetrainConstants drivetrainConstants,
@@ -124,12 +157,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       Matrix<N3, N1> odometryStdDevs,
       Matrix<N3, N1> visionStdDevs,
       SwerveModuleConstants<?, ?, ?>... modules) {
-    super(
-        drivetrainConstants,
-        odometryUpdateFrequency,
-        odometryStdDevs,
-        visionStdDevs,
-        modules);
+    super(drivetrainConstants, odometryUpdateFrequency, odometryStdDevs, visionStdDevs, modules);
     configurePathPlanner();
     if (Utils.isSimulation()) startSimThread();
   }
@@ -139,36 +167,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     this.m_allianceSupplier = allianceSupplier;
   }
 
-  // 這個會改 Pose heading（不是純 gyro 歸零），先保留但不要亂呼叫
   public void autoSeedFieldCentric() {
     double angle = (m_allianceSupplier != null && m_allianceSupplier.get()) ? 180.0 : 0.0;
-    this.resetPose(new Pose2d(getState().Pose.getTranslation(), Rotation2d.fromDegrees(angle)));
+    resetPose(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(angle)));
   }
 
-  // =========================
-  // ★座標系統一：外部一律用「-yaw」這套場地角度
-  // 你 Drive 目前用 -yaw 才正常 => 代表 Phoenix 內部 Pose rotation 符號跟你外部想用的相反
-  // 所以把 getPose/resetPose/vision 全部一起做同樣的 flip，避免互相打架繞圈
-  // =========================
-  private static Rotation2d flipRot(Rotation2d r) {
-    return Rotation2d.fromRadians(-r.getRadians());
-  }
 
-  private static Pose2d toFieldPose(Pose2d internalPose) {
-    return new Pose2d(internalPose.getTranslation(), flipRot(internalPose.getRotation()));
-  }
-
-  private static Pose2d toInternalPose(Pose2d fieldPose) {
-    return new Pose2d(fieldPose.getTranslation(), flipRot(fieldPose.getRotation()));
-  }
-
-  /**
-   * ★關鍵：提供「場地向」用的 heading。
-   * 你目前 Drive 用 -yaw 才正 => 這裡保留 -yaw。
-   */
-  public Rotation2d getFieldHeading() {
-    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
-  }
+public Rotation2d getFieldHeading() {
+  Rotation2d r = getState().Pose.getRotation();
+  return Rotation2d.fromRadians(-r.getRadians());
+}
 
   private void configurePathPlanner() {
     RobotConfig config;
@@ -180,8 +188,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     AutoBuilder.configure(
-        this::getPose,                      // ★回傳「場地座標系 Pose」
-        this::resetPose,                    // ★吃「場地座標系 Pose」
+        this::getPose,        
+        this::resetPose,     
         this::getRobotRelativeSpeeds,
         speeds -> setControl(m_pathApply.withSpeeds(speeds)),
         new PPHolonomicDriveController(
@@ -194,45 +202,46 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   @Override
   public void periodic() {
+
+    SwerveModulePosition[] modulePositions = getState().ModulePositions;
+    m_poseEstimator.update(getFieldHeading(), modulePositions);
+
     SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
     SmartDashboard.putNumber("DEBUG/FieldHeadingDeg_used", getFieldHeading().getDegrees());
 
-    // 內部 Pose 角度（未 flip）做對照用
-    SmartDashboard.putNumber("DEBUG/PoseDeg_internal", getState().Pose.getRotation().getDegrees());
-    // 外部 Pose 角度（已 flip）才是你 Field2d/PathPlanner/視覺融合要用的
-    SmartDashboard.putNumber("DEBUG/PoseDeg_field", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
+
+    SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
 
     SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
     SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
 
     SmartDashboard.putNumber("Pose/X", getPose().getX());
     SmartDashboard.putNumber("Pose/Y", getPose().getY());
+
     field.setRobotPose(getPose());
     SmartDashboard.putData("field", field);
   }
 
-  // ★對外：一律回傳「場地座標系 Pose」（rotation 已 flip）
   public Pose2d getPose() {
-    return toFieldPose(getState().Pose);
+    return m_poseEstimator.getEstimatedPosition();
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return getState().Speeds;
   }
 
-  // ★對外 reset：吃「場地座標系 Pose」，丟給 super 前轉回內部座標系
   @Override
   public void resetPose(Pose2d pose) {
     m_resetPoseCount++;
 
     SmartDashboard.putNumber("DEBUG/LastReset_X", pose.getX());
     SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
-    SmartDashboard.putNumber("DEBUG/LastReset_Deg_field", pose.getRotation().getDegrees());
+    SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
 
-    System.out.println("[RESET POSE] (field) " + pose);
-    Thread.dumpStack();
+    m_poseEstimator.resetPosition(getFieldHeading(), getState().ModulePositions, pose);
 
-    super.resetPose(toInternalPose(pose));
+    super.resetPose(pose);
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -259,14 +268,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
-  // ★Vision：你 Vision 給進來的是「場地座標系 Pose」，丟給 super 前要轉回內部座標系
   @Override
   public void addVisionMeasurement(Pose2d pose, double timestampSeconds) {
-    super.addVisionMeasurement(toInternalPose(pose), timestampSeconds);
+    m_poseEstimator.addVisionMeasurement(pose, timestampSeconds);
   }
 
   @Override
   public void addVisionMeasurement(Pose2d pose, double timestampSeconds, Matrix<N3, N1> stdDevs) {
-    super.addVisionMeasurement(toInternalPose(pose), timestampSeconds, stdDevs);
+    m_poseEstimator.addVisionMeasurement(pose, timestampSeconds, stdDevs);
   }
 }

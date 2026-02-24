@@ -13,25 +13,21 @@ public class ShooterAuto extends Command {
   private final Shooter shooter;
   private final XboxController controller;
 
-  // ===== Yaw 追蹤參數 =====
   private static final double kYawP = 0.01;
-  private static final double kYawMaxOut = 0.35;
+  private static final double kYawMaxOut = 0.3;
   private static final double kYawTolDeg = 1.0;
   private static final double kMaxValidTxDeg = 30.0;
 
-  // ===== 送彈設定 =====
   private static final double kTrainDuty = -0.7;
   private static final double kIntakeDuty = 0.85;
   private static final double kFireTrig = 0.3;
 
-  // ===== 送彈保護（你要「按扳機就一定送」就改 false）=====
   private static final boolean kGateByRPM = false;
   private static final double kRpmTol = 120.0;
   private static final double kSpinupMinTime = 0.2;
 
   private double startTime;
 
-  // ===== 最後一次有效 setpoint（用來 hold）=====
   private double lastTargetRpm = 2200.0;
   private double lastTargetPitchRot = -0.45;
 
@@ -52,8 +48,7 @@ public class ShooterAuto extends Command {
     boolean hasTarget = shooter.hasLLTarget();
     double dist = shooter.getlong();
 
-    // ===== 1) Pitch/RPM：能更新就更新；不能更新就 hold =====
-    boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0; // 基本合理範圍
+    boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0; 
     if (hasTarget && distValid) {
       ShooterLookup.Point sp = ShooterLookup.sample(dist);
       lastTargetRpm = sp.rpm;
@@ -63,11 +58,9 @@ public class ShooterAuto extends Command {
       SmartDashboard.putString("Auto/setpointMode", "HOLD");
     }
 
-    // 不管按不按扳機：Pitch/RPM 永遠照 setpoint 控制
     shooter.setPitchPosition(lastTargetPitchRot);
     shooter.setShooterRPM(lastTargetRpm);
 
-    // ===== 2) Yaw：只有有目標才追，沒目標就停 =====
     if (hasTarget) {
       double tx = shooter.getLLTx();
       if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
@@ -91,7 +84,6 @@ public class ShooterAuto extends Command {
       SmartDashboard.putNumber("Auto/yawCmd", 0);
     }
 
-    // ===== 3) 扳機：不管有沒有目標，都可以送彈 =====
     boolean trigger = controller.getRightTriggerAxis() > kFireTrig;
 
     boolean rpmReady = Math.abs(shooter.getShooterRPM() - lastTargetRpm) <= kRpmTol;
@@ -131,7 +123,6 @@ public class ShooterAuto extends Command {
     shooter.setTrainSpeed(0);
     shooter.setIntaketrainSpeed(0);
     shooter.stopShooter();
-    // pitch 通常保持位置；你要停就加 shooter.stopPitch();
   }
 
   @Override
