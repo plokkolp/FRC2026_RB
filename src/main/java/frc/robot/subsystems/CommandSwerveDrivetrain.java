@@ -43,11 +43,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private Supplier<Boolean> m_allianceSupplier;
 
-  private final SwerveRequest.ApplyRobotSpeeds m_pathApply =
-      new SwerveRequest.ApplyRobotSpeeds();
+  private final SwerveRequest.ApplyRobotSpeeds m_pathApply = new SwerveRequest.ApplyRobotSpeeds();
 
   private final Field2d field = new Field2d();
-
 
   // ===== SysId =====
   private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
@@ -147,10 +145,29 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     this.resetPose(new Pose2d(getState().Pose.getTranslation(), Rotation2d.fromDegrees(angle)));
   }
 
+  // =========================
+  // ★座標系統一：外部一律用「-yaw」這套場地角度
+  // 你 Drive 目前用 -yaw 才正常 => 代表 Phoenix 內部 Pose rotation 符號跟你外部想用的相反
+  // 所以把 getPose/resetPose/vision 全部一起做同樣的 flip，避免互相打架繞圈
+  // =========================
+  private static Rotation2d flipRot(Rotation2d r) {
+    return Rotation2d.fromRadians(-r.getRadians());
+  }
 
+  private static Pose2d toFieldPose(Pose2d internalPose) {
+    return new Pose2d(internalPose.getTranslation(), flipRot(internalPose.getRotation()));
+  }
+
+  private static Pose2d toInternalPose(Pose2d fieldPose) {
+    return new Pose2d(fieldPose.getTranslation(), flipRot(fieldPose.getRotation()));
+  }
+
+  /**
+   * ★關鍵：提供「場地向」用的 heading。
+   * 你目前 Drive 用 -yaw 才正 => 這裡保留 -yaw。
+   */
   public Rotation2d getFieldHeading() {
-    double yawDeg = getPigeon2().getYaw().getValueAsDouble();
-    return Rotation2d.fromDegrees(-yawDeg); // ★修正 2θ 的核心
+    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
   }
 
   private void configurePathPlanner() {
@@ -163,8 +180,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     AutoBuilder.configure(
-        this::getPose,
-        this::resetPose,
+        this::getPose,                      // ★回傳「場地座標系 Pose」
+        this::resetPose,                    // ★吃「場地座標系 Pose」
         this::getRobotRelativeSpeeds,
         speeds -> setControl(m_pathApply.withSpeeds(speeds)),
         new PPHolonomicDriveController(
@@ -179,36 +196,43 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void periodic() {
     SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
     SmartDashboard.putNumber("DEBUG/FieldHeadingDeg_used", getFieldHeading().getDegrees());
-    SmartDashboard.putNumber("DEBUG/PoseDeg", getState().Pose.getRotation().getDegrees());
+
+    // 內部 Pose 角度（未 flip）做對照用
+    SmartDashboard.putNumber("DEBUG/PoseDeg_internal", getState().Pose.getRotation().getDegrees());
+    // 外部 Pose 角度（已 flip）才是你 Field2d/PathPlanner/視覺融合要用的
+    SmartDashboard.putNumber("DEBUG/PoseDeg_field", getPose().getRotation().getDegrees());
+
     SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
     SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
-    
+
     SmartDashboard.putNumber("Pose/X", getPose().getX());
     SmartDashboard.putNumber("Pose/Y", getPose().getY());
     field.setRobotPose(getPose());
     SmartDashboard.putData("field", field);
   }
 
+  // ★對外：一律回傳「場地座標系 Pose」（rotation 已 flip）
   public Pose2d getPose() {
-    return getState().Pose;
+    return toFieldPose(getState().Pose);
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return getState().Speeds;
   }
 
+  // ★對外 reset：吃「場地座標系 Pose」，丟給 super 前轉回內部座標系
   @Override
   public void resetPose(Pose2d pose) {
     m_resetPoseCount++;
 
     SmartDashboard.putNumber("DEBUG/LastReset_X", pose.getX());
     SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
-    SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
+    SmartDashboard.putNumber("DEBUG/LastReset_Deg_field", pose.getRotation().getDegrees());
 
-    System.out.println("[RESET POSE] " + pose);
+    System.out.println("[RESET POSE] (field) " + pose);
     Thread.dumpStack();
 
-    super.resetPose(pose);
+    super.resetPose(toInternalPose(pose));
   }
 
   public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
@@ -235,13 +259,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     m_simNotifier.startPeriodic(kSimLoopPeriod);
   }
 
+  // ★Vision：你 Vision 給進來的是「場地座標系 Pose」，丟給 super 前要轉回內部座標系
   @Override
   public void addVisionMeasurement(Pose2d pose, double timestampSeconds) {
-    super.addVisionMeasurement(pose, timestampSeconds);
+    super.addVisionMeasurement(toInternalPose(pose), timestampSeconds);
   }
 
   @Override
   public void addVisionMeasurement(Pose2d pose, double timestampSeconds, Matrix<N3, N1> stdDevs) {
-    super.addVisionMeasurement(pose, timestampSeconds, stdDevs);
+    super.addVisionMeasurement(toInternalPose(pose), timestampSeconds, stdDevs);
   }
 }
