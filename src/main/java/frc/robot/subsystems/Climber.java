@@ -35,7 +35,5 @@ public class Climber extends SubsystemBase {
     left.setControl(new DutyCycleOut(speed));
      right.setControl(new DutyCycleOut(-speed));
   }
-  public void stopAll() {
-
-  }
+  
 }

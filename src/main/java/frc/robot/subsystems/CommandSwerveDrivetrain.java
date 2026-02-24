@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -44,6 +45,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private final SwerveRequest.ApplyRobotSpeeds m_pathApply =
       new SwerveRequest.ApplyRobotSpeeds();
+
+  private final Field2d field = new Field2d();
+
 
   // ===== SysId =====
   private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization =
@@ -143,13 +147,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     this.resetPose(new Pose2d(getState().Pose.getTranslation(), Rotation2d.fromDegrees(angle)));
   }
 
-  /**
-   * ★關鍵：提供「場地向」用的 heading。
-   * 你目前的現象（車轉θ，正向轉2θ）幾乎等於 gyro 角度符號反了。
-   * 所以這裡直接回傳 -yaw 來修正。
-   */
+
   public Rotation2d getFieldHeading() {
-    // 你 SmartDashboard 的 GyroYaw 顯示就是 degrees 量級（87、173那種）
     double yawDeg = getPigeon2().getYaw().getValueAsDouble();
     return Rotation2d.fromDegrees(-yawDeg); // ★修正 2θ 的核心
   }
@@ -178,12 +177,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   @Override
   public void periodic() {
-    // ===== Debug：只看真正會變的值 =====
     SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
     SmartDashboard.putNumber("DEBUG/FieldHeadingDeg_used", getFieldHeading().getDegrees());
     SmartDashboard.putNumber("DEBUG/PoseDeg", getState().Pose.getRotation().getDegrees());
     SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
     SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
+    
+    SmartDashboard.putNumber("Pose/X", getPose().getX());
+    SmartDashboard.putNumber("Pose/Y", getPose().getY());
+    field.setRobotPose(getPose());
+    SmartDashboard.putData("field", field);
   }
 
   public Pose2d getPose() {
