@@ -45,11 +45,11 @@ public class TunerConstants {
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     
-    // private static final Pigeon2Configuration pigeonConfigs = null;
-   private static final Pigeon2Configuration pigeonConfigs =
-    new Pigeon2Configuration()
-        .withMountPose(new MountPoseConfigs()
-            .withMountPoseRoll(180.0));   
+    private static final Pigeon2Configuration pigeonConfigs = null;
+//    private static final Pigeon2Configuration pigeonConfigs =
+//     new Pigeon2Configuration()
+//         .withMountPose(new MountPoseConfigs()
+//             .withMountPoseRoll(-180));   
 
     public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
 

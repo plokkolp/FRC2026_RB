@@ -172,21 +172,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public Rotation2d getOdomHeading() {
-    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
+    return Rotation2d.fromDegrees(getPigeon2().getYaw().getValueAsDouble());
   }
 
   public Rotation2d getTeleopHeading() {
-    return getOdomHeading();
+    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
   }
 
-  // 舊名保留（避免你其他地方還在呼叫）
   public Rotation2d getFieldHeading() {
     return getTeleopHeading();
   }
 
-  // =========================
-  // 歸零：gyro 歸零 + estimator 同步
-  // =========================
   public void seedFieldCentric() {
     getPigeon2().setYaw(0);
 
