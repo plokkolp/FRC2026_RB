@@ -16,6 +16,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
+import frc.robot.commands.Auto.AutoClimber;
+import frc.robot.commands.Auto.AutoGetFuelDown;
+import frc.robot.commands.Auto.AutoGetFuelUp;
 import frc.robot.commands.Auto.AutoShoot;
 import frc.robot.constants.ConsController;
 import frc.robot.generated.TunerConstants;
@@ -82,7 +85,7 @@ public class RobotContainer {
         .toggleOnTrue(new Shoot2(m_shooter,operator, driver));
 
     new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
-        .toggleOnTrue(new TeleGetFuel(m_intake));
+        .toggleOnTrue(new TeleGetFuel(m_intake,operator));
 
     new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
         .toggleOnTrue(new Climb(m_Climber,driver));
@@ -154,6 +157,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", new MJ(m_shooter));
     NamedCommands.registerCommand("Shoot1", new MJ1(m_shooter));
     NamedCommands.registerCommand("Shooter", new AutoShoot(m_shooter));
+    NamedCommands.registerCommand("Climber", new AutoClimber(m_Climber));
+    NamedCommands.registerCommand("UP", new AutoGetFuelUp(m_intake));
+    NamedCommands.registerCommand("DOWN", new AutoGetFuelDown(m_intake));
 
   }
 }

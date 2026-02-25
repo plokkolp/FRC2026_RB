@@ -33,6 +33,6 @@ public class AutoGetFuelUp extends Command {
   @Override
   public boolean isFinished() {
     double current = intake.getAnglePositionRot();
-    return Math.abs(current - POS_UP) < TOLERANCE;
+    return false;
   }
 }

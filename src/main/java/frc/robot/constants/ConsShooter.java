@@ -65,19 +65,19 @@ public final class ConsShooter {
     ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.35+0.1123046875+0.188720703125;
 
     ANGLE_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackRemoteSensorID = ANGLE_CANCODER_ID;
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackSensorSource   = FeedbackSensorSourceValue.FusedCANcoder;
 
-    ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 1.0;
-    ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio =1.0;
+    ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 200.0 / 7.0;
+ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio = 1.0;
 
-    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
-    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
-   
-    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0;
-    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
+ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.8;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.8;
   
 
 
@@ -92,7 +92,7 @@ public final class ConsShooter {
           .withPeakReverseVoltage(-8);
 
   private static final Slot0Configs MINION_POS_SLOT0 =
-      new Slot0Configs()
+      new Slot0Configs()//-1.148681640625//1.0693359375
           .withKP(1.0)
           .withKI(0.0)
           .withKD(0.0);

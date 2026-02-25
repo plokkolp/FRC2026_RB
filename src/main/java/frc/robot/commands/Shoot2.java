@@ -51,7 +51,7 @@ public class Shoot2 extends Command {
   public void execute() {
 
     boolean lbHeld = controller.getLeftBumperButton();
-    double rx = -controller.getRightX(); 
+    double rx = controller.getRightX(); 
     if (lbHeld) {
 
       double manualYawOut = 0.0;
@@ -85,7 +85,7 @@ public class Shoot2 extends Command {
         double tx = shooter.getLLTx();
         if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
           if (Math.abs(tx) > kYawTolDeg) {
-            double yawCmd = -tx * kYawP;
+            double yawCmd =  tx * kYawP;
             yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
             shooter.setYawSpeed(yawCmd);
             SmartDashboard.putNumber("Auto/yawCmd", yawCmd);
