@@ -1,4 +1,4 @@
-package frc.robot.commands.Auto;
+package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
@@ -8,10 +8,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 import frc.robot.ShooterLookup;
 
-public class AutoShoot extends Command {
+public class Shoot2 extends Command {
 
   private final Shooter shooter;
-  
+  private final XboxController controller;
+  private final XboxController drive;
 
   private static final double kYawP = 0.01;
   private static final double kYawMaxOut = 0.3;
@@ -31,8 +32,13 @@ public class AutoShoot extends Command {
   private double lastTargetRpm = 2200.0;
   private double lastTargetPitchRot = -0.45;
 
-  public AutoShoot(Shooter shooter) {
+  private static final double kManualDeadband = 0.1;
+  private static final double kManualScale = 0.06;   
+
+  public Shoot2(Shooter shooter, XboxController controller,XboxController drive) {
     this.shooter = shooter;
+    this.controller = controller;
+    this.drive = drive;
     addRequirements(shooter);
   }
 
@@ -44,46 +50,63 @@ public class AutoShoot extends Command {
   @Override
   public void execute() {
 
-    boolean hasTarget = shooter.hasLLTarget();
-    double dist = shooter.getlong();
+    boolean lbHeld = controller.getLeftBumperButton();
+    double rx = -controller.getRightX(); 
+    if (lbHeld) {
 
-    boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0; 
-    if (hasTarget && distValid) {
-      ShooterLookup.Point sp = ShooterLookup.sample(dist);
-      lastTargetRpm = sp.rpm;
-      lastTargetPitchRot = sp.pitchRot;
-      SmartDashboard.putString("Auto/setpointMode", "LIVE");
+      double manualYawOut = 0.0;
+      if (Math.abs(rx) > kManualDeadband) {
+        manualYawOut = MathUtil.clamp(rx * kManualScale, -1.0, 1.0);
+      }
+      shooter.setYawSpeed(manualYawOut);
+
+      SmartDashboard.putBoolean("Auto/manualOverride", true);
+      SmartDashboard.putNumber("Auto/manual_rx", rx);
+      SmartDashboard.putNumber("Auto/manualYawOut", manualYawOut);
+
     } else {
-      SmartDashboard.putString("Auto/setpointMode", "HOLD");
-    }
 
-    shooter.setPitchPosition(lastTargetPitchRot);
-    shooter.setShooterRPM(lastTargetRpm);
+      SmartDashboard.putBoolean("Auto/manualOverride", false);
 
-    if (hasTarget) {
-      double tx = shooter.getLLTx();
-      if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
-        if (Math.abs(tx) > kYawTolDeg) {
-          double yawCmd = -tx * kYawP;
-          yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
-          shooter.setYawSpeed(yawCmd);
-          SmartDashboard.putNumber("Auto/yawCmd", yawCmd);
+      boolean hasTarget = shooter.hasLLTarget();
+      double dist = shooter.getlong();
+
+      boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
+      if (hasTarget && distValid) {
+        ShooterLookup.Point sp = ShooterLookup.sample(dist);
+        lastTargetRpm = sp.rpm;
+        lastTargetPitchRot = sp.pitchRot;
+      }
+
+      shooter.setPitchPosition(lastTargetPitchRot);
+      shooter.setShooterRPM(lastTargetRpm);
+
+      if (hasTarget) {
+        double tx = shooter.getLLTx();
+        if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
+          if (Math.abs(tx) > kYawTolDeg) {
+            double yawCmd = -tx * kYawP;
+            yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
+            shooter.setYawSpeed(yawCmd);
+            SmartDashboard.putNumber("Auto/yawCmd", yawCmd);
+          } else {
+            shooter.setYawSpeed(0);
+            SmartDashboard.putNumber("Auto/yawCmd", 0);
+          }
         } else {
           shooter.setYawSpeed(0);
           SmartDashboard.putNumber("Auto/yawCmd", 0);
         }
+        SmartDashboard.putNumber("Auto/tx", tx);
       } else {
         shooter.setYawSpeed(0);
+        SmartDashboard.putNumber("Auto/tx", 999);
         SmartDashboard.putNumber("Auto/yawCmd", 0);
       }
-      SmartDashboard.putNumber("Auto/tx", tx);
-    } else {
-      shooter.setYawSpeed(0);
-      SmartDashboard.putNumber("Auto/tx", 999);
-      SmartDashboard.putNumber("Auto/yawCmd", 0);
     }
 
-    boolean trigger = shooter.getLeftShooterRPM() > 2000;
+
+    boolean trigger = drive.getRightTriggerAxis() > 0.3;
 
     boolean rpmReady = Math.abs(shooter.getShooterRPM() - lastTargetRpm) <= kRpmTol;
     boolean timeReady = (Timer.getFPGATimestamp() - startTime) > kSpinupMinTime;
@@ -100,20 +123,6 @@ public class AutoShoot extends Command {
       shooter.setTrainSpeed(0);
       shooter.setIntaketrainSpeed(0);
     }
-
-    // ===== Debug =====
-    // SmartDashboard.putBoolean("Auto/hasTarget", hasTarget);
-    // SmartDashboard.putNumber("Auto/dist", dist);
-
-    // SmartDashboard.putNumber("Auto/RPM_target", lastTargetRpm);
-    // SmartDashboard.putNumber("Auto/RPM_now", shooter.getShooterRPM());
-
-    // SmartDashboard.putNumber("Auto/Pitch_targetRot", lastTargetPitchRot);
-    // SmartDashboard.putNumber("Auto/Pitch_nowRot", shooter.getPitchPositionRot());
-
-    // SmartDashboard.putBoolean("Auto/trigger", trigger);
-    // SmartDashboard.putBoolean("Auto/rpmReady", rpmReady);
-    // SmartDashboard.putBoolean("Auto/allowFeed", allowFeed);
   }
 
   @Override

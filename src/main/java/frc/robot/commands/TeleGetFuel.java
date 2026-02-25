@@ -1,11 +1,14 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake;
 
 public class TeleGetFuel extends Command {
 
   private final Intake intake;
+  // private final XboxController controller;
+
 
   private static final double POS_DOWN = 14.81;
   private static final double POS_UP   = 0.0;
@@ -15,6 +18,7 @@ public class TeleGetFuel extends Command {
 
   public TeleGetFuel(Intake intake) {
     this.intake = intake;
+    // this.controller = controller;
     addRequirements(intake);
   }
 
@@ -36,7 +40,16 @@ public class TeleGetFuel extends Command {
 
   @Override
   public void execute() {
-  }
+    // if(controller.getAButton()){
+    //         intake.setAnglePositionRot(9);}
+    //         else{
+    //           intake.setAnglePositionRot(POS_DOWN);
+
+    //         }
+
+
+    }
+  
 
   @Override
   public void end(boolean interrupted) {

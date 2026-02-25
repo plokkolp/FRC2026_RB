@@ -79,16 +79,21 @@ public class RobotContainer {
     // .toggleOnTrue(new ShooterMaster(m_shooter));
 
     new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-        .toggleOnTrue(new ShooterAuto(m_shooter, driver));
+        .toggleOnTrue(new Shoot2(m_shooter,operator, driver));
 
-    new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
+    new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
         .toggleOnTrue(new TeleGetFuel(m_intake));
 
-    new JoystickButton(driver, ConsController.Button.BUTTON_A.id)
-        .whileTrue(new ClimberTest(m_Climber, -0.1));
-
     new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
-        .whileTrue(new ClimberTest(m_Climber, +0.1));
+        .toggleOnTrue(new Climb(m_Climber,driver));
+
+        new JoystickButton(driver,ConsController.Button.BUTTON_C.id)
+    .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
+        drivetrain::seedFieldCentric,
+        drivetrain
+    ));
+        
+
     // new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
     // .whileTrue(new ShooterEasy(m_shooter, driver
     // ));
@@ -115,13 +120,13 @@ public class RobotContainer {
             () -> MathUtil.applyDeadband(+driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id), 0.06),
             () -> MathUtil.applyDeadband(-driver.getRawAxis(ConsController.Axis.RIGHT_STICK_X.id), 0.06)));
 
-    // m_shooter.setDefaultCommand(
-    //     new ShooterTest(
-    //         m_shooter,
-    //         () -> MathUtil.applyDeadband(
-    //             -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
-    //             0.1),
-    //         () -> testJoy.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)));
+    m_shooter.setDefaultCommand(
+        new ShooterTest(
+            m_shooter,
+            () -> MathUtil.applyDeadband(
+                -testJoy.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id),
+                0.1),
+            () -> testJoy.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)));
 
     m_intake.setDefaultCommand(
         new IntakeTest(

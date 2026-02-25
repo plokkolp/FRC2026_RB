@@ -7,12 +7,10 @@ import frc.robot.subsystems.Climber;
 public class Climb extends Command {
 
   private final Climber climber;
-  private final double speed;
   private final XboxController controller;
 
-  public Climb(Climber climber, double speed, XboxController controller) {
+  public Climb(Climber climber, XboxController controller) {
     this.climber = climber;
-    this.speed = speed;
     this.controller = controller;
     addRequirements(climber);
   }
@@ -26,16 +24,15 @@ public class Climb extends Command {
   @Override
   public void execute() {
     
-    if(controller.getBButton()){
+    if(controller.getXButtonPressed()){
        climber.setPosition(-110);
-    }else{
-      climber.setPosition(-47.8);
     }
   }
 
   @Override
   public void end(boolean interrupted) {
-    climber.setDoubleSpeed(0);
+      climber.setPosition(-1.8);
+
   }
 
   @Override
