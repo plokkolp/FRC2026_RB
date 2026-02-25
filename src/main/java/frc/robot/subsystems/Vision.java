@@ -106,8 +106,8 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    SmartDashboard.putBoolean("Vision/LeftConnected", leftCam.isConnected());
-    SmartDashboard.putBoolean("Vision/RightConnected", rightCam.isConnected());
+    // SmartDashboard.putBoolean("Vision/LeftConnected", leftCam.isConnected());
+    // SmartDashboard.putBoolean("Vision/RightConnected", rightCam.isConnected());
 
     Pose2d odo = drivetrain.getPose();
     Pose3d ref = new Pose3d(odo);
@@ -141,10 +141,10 @@ public class Vision extends SubsystemBase {
       double yawDeltaDeg =
           Math.abs(L.pose.getRotation().minus(R.pose.getRotation()).getDegrees());
 
-      SmartDashboard.putBoolean("Vision/Dual/sameTag", sameTag);
-      SmartDashboard.putNumber("Vision/Dual/dt", dt);
-      SmartDashboard.putNumber("Vision/Dual/posDelta", posDelta);
-      SmartDashboard.putNumber("Vision/Dual/yawDeltaDeg", yawDeltaDeg);
+      // SmartDashboard.putBoolean("Vision/Dual/sameTag", sameTag);
+      // SmartDashboard.putNumber("Vision/Dual/dt", dt);
+      // SmartDashboard.putNumber("Vision/Dual/posDelta", posDelta);
+      // SmartDashboard.putNumber("Vision/Dual/yawDeltaDeg", yawDeltaDeg);
 
       if (sameTag
           && dt <= kDualSameTagMaxDtSec
@@ -168,7 +168,7 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    SmartDashboard.putString("Vision/Gate", "REJECT");
+    // SmartDashboard.putString("Vision/Gate", "REJECT");
   }
 
   private static class Candidate {
@@ -206,13 +206,13 @@ public class Vision extends SubsystemBase {
 
     PhotonPipelineResult result = cam.getLatestResult();
     if (!result.hasTargets()) {
-      SmartDashboard.putString("Vision/" + cam.getName(), "NO_TARGETS");
+      // SmartDashboard.putString("Vision/" + cam.getName(), "NO_TARGETS");
       return Optional.empty();
     }
 
     Optional<EstimatedRobotPose> opt = estimator.update(result);
     if (opt.isEmpty()) {
-      SmartDashboard.putString("Vision/" + cam.getName(), "NO_POSE");
+      // SmartDashboard.putString("Vision/" + cam.getName(), "NO_POSE");
       return Optional.empty();
     }
 
@@ -244,20 +244,20 @@ public class Vision extends SubsystemBase {
 
     // 只看 vision 自己的品質：太遠 / 太不確定就拒絕
     if (avgDist > kRejectAvgDist || avgAmb > kRejectAvgAmb) {
-      SmartDashboard.putString("Vision/" + cam.getName(), "CAND_REJECT_QUALITY");
-      SmartDashboard.putNumber("Vision/" + cam.getName() + "/jumpM", jumpMeters);
-      SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgAmb", avgAmb);
-      SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgDist", avgDist);
+      // SmartDashboard.putString("Vision/" + cam.getName(), "CAND_REJECT_QUALITY");
+      // SmartDashboard.putNumber("Vision/" + cam.getName() + "/jumpM", jumpMeters);
+      // SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgAmb", avgAmb);
+      // SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgDist", avgDist);
       return Optional.empty();
     }
 
-    SmartDashboard.putString("Vision/" + cam.getName(), "CAND_OK");
-    SmartDashboard.putNumber("Vision/" + cam.getName() + "/tags", tagCount);
-    SmartDashboard.putNumber("Vision/" + cam.getName() + "/bestFid", bestFid);
-    SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgAmb", avgAmb);
-    SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgDist", avgDist);
-    SmartDashboard.putNumber("Vision/" + cam.getName() + "/jumpM", jumpMeters);
-    SmartDashboard.putNumber("Vision/" + cam.getName() + "/tsAge", Timer.getFPGATimestamp() - ts);
+    // SmartDashboard.putString("Vision/" + cam.getName(), "CAND_OK");
+    // SmartDashboard.putNumber("Vision/" + cam.getName() + "/tags", tagCount);
+    // SmartDashboard.putNumber("Vision/" + cam.getName() + "/bestFid", bestFid);
+    // SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgAmb", avgAmb);
+    // SmartDashboard.putNumber("Vision/" + cam.getName() + "/avgDist", avgDist);
+    // SmartDashboard.putNumber("Vision/" + cam.getName() + "/jumpM", jumpMeters);
+    // SmartDashboard.putNumber("Vision/" + cam.getName() + "/tsAge", Timer.getFPGATimestamp() - ts);
 
     return Optional.of(
         new Candidate(cam.getName(), pose, ts, tagCount, bestFid, avgAmb, avgDist, jumpMeters));
@@ -286,11 +286,11 @@ public class Vision extends SubsystemBase {
     hasHardSeededPose = true;
     hardSeedTs = Timer.getFPGATimestamp();
 
-    SmartDashboard.putString("Vision/HardSeed/Reason", reason);
-    SmartDashboard.putNumber("Vision/HardSeed/ts", hardSeedTs);
-    SmartDashboard.putNumber("Vision/HardSeed/X", c.pose.getX());
-    SmartDashboard.putNumber("Vision/HardSeed/Y", c.pose.getY());
-    SmartDashboard.putNumber("Vision/HardSeed/Deg", c.pose.getRotation().getDegrees());
+    // SmartDashboard.putString("Vision/HardSeed/Reason", reason);
+    // SmartDashboard.putNumber("Vision/HardSeed/ts", hardSeedTs);
+    // SmartDashboard.putNumber("Vision/HardSeed/X", c.pose.getX());
+    // SmartDashboard.putNumber("Vision/HardSeed/Y", c.pose.getY());
+    // SmartDashboard.putNumber("Vision/HardSeed/Deg", c.pose.getRotation().getDegrees());
   }
 
   private void fuse(Candidate c, String reason) {
@@ -317,13 +317,13 @@ public class Vision extends SubsystemBase {
 
     drivetrain.addVisionMeasurement(c.pose, c.timestamp, stdDevs);
 
-    SmartDashboard.putString("Vision/Gate", reason);
-    SmartDashboard.putString("Vision/FusedCam", c.camName);
-    SmartDashboard.putNumber("Vision/Fused/bestFid", c.bestFid);
-    SmartDashboard.putNumber("Vision/Fused/timestampAge", Timer.getFPGATimestamp() - c.timestamp);
-    SmartDashboard.putNumber("Vision/Fused/stdX", sx);
-    SmartDashboard.putNumber("Vision/Fused/stdY", sy);
-    SmartDashboard.putNumber("Vision/Fused/stdThetaDeg", Math.toDegrees(st));
+    // SmartDashboard.putString("Vision/Gate", reason);
+    // SmartDashboard.putString("Vision/FusedCam", c.camName);
+    // SmartDashboard.putNumber("Vision/Fused/bestFid", c.bestFid);
+    // SmartDashboard.putNumber("Vision/Fused/timestampAge", Timer.getFPGATimestamp() - c.timestamp);
+    // SmartDashboard.putNumber("Vision/Fused/stdX", sx);
+    // SmartDashboard.putNumber("Vision/Fused/stdY", sy);
+    // SmartDashboard.putNumber("Vision/Fused/stdThetaDeg", Math.toDegrees(st));
   }
 
   private static double clamp(double v, double lo, double hi) {

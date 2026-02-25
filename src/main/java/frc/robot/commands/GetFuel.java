@@ -43,10 +43,15 @@ public class GetFuel extends Command {
       intake.setRolling(0.9);
   }
 
-  if(driver.getAButton()){
-      
-    intake.setAnglePositionRot(POS_UP);
+  if(driver.getLeftBumperButton()){
+    
+   if(intake.getAnglePositionRot() - 10 < 1.2){
+    intake.setAnglePositionRot(POS_DOWN);
+   } else {
+    intake.setAnglePositionRot(8);
+   }
   }
+
 
   }
    @Override

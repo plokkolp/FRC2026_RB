@@ -268,5 +268,8 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("LL/tx_hold_active",
         txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec);
 
+        SmartDashboard.putNumber("Yaw/MotorPositionRot", getYawMotorPositionRot());
+SmartDashboard.putNumber("Yaw/CANCoderAbs", getYawAbsRot());
+SmartDashboard.putNumber("Yaw/CANCoderNoOffset", getYawCanNoOffsetRot());
   }
 }

@@ -21,20 +21,18 @@ public class Drive extends Command {
   private final CommandSwerveDrivetrain drivetrain;
   private final DoubleSupplier vX, vY, vOmega;
 
-  private final SwerveRequest.ApplyRobotSpeeds driveRequest =
-      new SwerveRequest.ApplyRobotSpeeds()
-          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.ApplyRobotSpeeds driveRequest = new SwerveRequest.ApplyRobotSpeeds()
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private static final double kDeadband = 0.08;
 
-  private static final double kMaxOmegaRadPerSec = 2.3* Math.PI;
+  private static final double kMaxOmegaRadPerSec = 2.3 * Math.PI;
 
   public Drive(
       CommandSwerveDrivetrain drivetrain,
       DoubleSupplier vX,
       DoubleSupplier vY,
-      DoubleSupplier vOmega
-  ) {
+      DoubleSupplier vOmega) {
     this.drivetrain = drivetrain;
     this.vX = vX;
     this.vY = vY;
@@ -45,35 +43,31 @@ public class Drive extends Command {
   @Override
   public void execute() {
 
-    double xInput = vX.getAsDouble();
-    double yInput = vY.getAsDouble();
-    double omegaInput = vOmega.getAsDouble();
+    double xInput = -vX.getAsDouble();
+    double yInput = -vY.getAsDouble();
+    double omegaInput = -vOmega.getAsDouble();
 
-    double maxSpeedMps =
-        TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
     double xMps = xInput * maxSpeedMps;
     double yMps = yInput * maxSpeedMps;
     double omegaRadPerSec = omegaInput * kMaxOmegaRadPerSec;
 
-Rotation2d heading = drivetrain.getTeleopHeading();
+    Rotation2d heading = drivetrain.getTeleopHeading();
 
-    ChassisSpeeds robotSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            xMps,
-            yMps,
-            omegaRadPerSec,
-            heading
-        );
+    ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        xMps,
+        yMps,
+        omegaRadPerSec,
+        heading);
 
     drivetrain.setControl(
-        driveRequest.withSpeeds(robotSpeeds)
-    );
+        driveRequest.withSpeeds(robotSpeeds));
 
-    SmartDashboard.putNumber("Drive/x_mps", xMps);
-    SmartDashboard.putNumber("Drive/y_mps", yMps);
-    SmartDashboard.putNumber("Drive/omega_radps", omegaRadPerSec);
-    SmartDashboard.putNumber("Drive/maxSpeed", maxSpeedMps);
+    // SmartDashboard.putNumber("Drive/x_mps", xMps);
+    // SmartDashboard.putNumber("Drive/y_mps", yMps);
+    // SmartDashboard.putNumber("Drive/omega_radps", omegaRadPerSec);
+    // SmartDashboard.putNumber("Drive/maxSpeed", maxSpeedMps);
   }
 
   @Override

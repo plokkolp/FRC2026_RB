@@ -231,8 +231,8 @@ public double getDistanceMeters() {
     // SmartDashboard.putNumber("LL4/tync", getTYNC());
     // SmartDashboard.putNumber("LL4/tagID", getTagID());
     // SmartDashboard.putNumber("LL4/bestYawErrDeg(A)", getBestGoalYawDeg());
-    SmartDashboard.putNumber("Long/Tag", getBestTagDistanceMeters());
-    SmartDashboard.putNumber("Long/Hub", getDistanceMeters());
+    // SmartDashboard.putNumber("Long/Tag", getBestTagDistanceMeters());
+    // SmartDashboard.putNumber("Long/Hub", getDistanceMeters());
 
   }
 }

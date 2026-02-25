@@ -25,14 +25,14 @@ public final class ConsShooter {
 
  private static final Slot0Configs SHOOTER_VEL_SLOT0 =
     new Slot0Configs()
-        .withKS(0.15)    // 先給小摩擦補償(Volt)，0.10~0.40 可試
-        .withKV(0.16)    // 先給速度前饋(Volt/RPS)，0.10~0.18 可試
-        .withKP(0.40)    // 先小一點，避免震盪
+        .withKS(0.15)    
+        .withKV(0.16)    
+        .withKP(0.40)    
         .withKI(0.00)     //哇 Chao
-        .withKD(0.0);   // 先不加D，穩了再加 0.0~0.1 量級
-
-
-  static {
+        .withKD(0.0);   
+        
+        
+    static {
     LEFT_SHOOTER_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     LEFT_SHOOTER_CONFIG.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     LEFT_SHOOTER_CONFIG.Slot0 = SHOOTER_VEL_SLOT0;
@@ -58,11 +58,11 @@ public final class ConsShooter {
       new Slot0Configs()
           .withKP(1)
           .withKI(0.0)
-          .withKD(0.08);
+          .withKD(0.1);
 
   static {
 
-    ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.35;
+    ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.35+0.1123046875+0.188720703125;
 
     ANGLE_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -70,8 +70,16 @@ public final class ConsShooter {
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackRemoteSensorID = ANGLE_CANCODER_ID;
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackSensorSource   = FeedbackSensorSourceValue.FusedCANcoder;
 
-    ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 10.0;
+    ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 1.0;
     ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio =1.0;
+
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+   
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.0;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.0;
+  
+
 
     ANGLE_MOTOR_CONFIG.Slot0 = ANGLE_POS_SLOT0;
   }

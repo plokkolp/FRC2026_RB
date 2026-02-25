@@ -172,11 +172,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public Rotation2d getOdomHeading() {
-    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
+    return getPigeon2().getRotation2d();
   }
 
   public Rotation2d getTeleopHeading() {
-    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
+    return getPigeon2().getRotation2d();
   }
 
   public Rotation2d getFieldHeading() {
@@ -218,7 +218,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     this::resetPose,
     this::getRobotRelativeSpeeds,
     speeds -> {
-      // 只修正旋轉方向（若你現在是「旋轉反了」）
       ChassisSpeeds fixed = new ChassisSpeeds(
           speeds.vxMetersPerSecond,
           speeds.vyMetersPerSecond,
@@ -240,15 +239,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // 里程計更新：永遠用乾淨 odom heading
     m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
-    SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
-    SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
-    SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
+    // SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
-    SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
-    SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
 
-    SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
-    SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
+    // SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
+    // SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
 
     SmartDashboard.putNumber("Pose/X", getPose().getX());
     SmartDashboard.putNumber("Pose/Y", getPose().getY());
@@ -269,11 +268,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void resetPose(Pose2d pose) {
     m_resetPoseCount++;
 
-    SmartDashboard.putNumber("DEBUG/LastReset_X", pose.getX());
-    SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
-    SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/LastReset_X", pose.getX());
+    // SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
+    // SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
 
-    // 只重設 estimator（保持乾淨），不要再 super.resetPose() 造成雙里程計互打
     m_poseEstimator.resetPosition(getOdomHeading(), getState().ModulePositions, pose);
   }
 

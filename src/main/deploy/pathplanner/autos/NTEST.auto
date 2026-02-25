@@ -9,6 +9,24 @@
           "data": {
             "pathName": "right LOOK1"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RIGHT LOOK 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RIGHTLOOK 3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RIGHT LOOK 4"
+          }
         }
       ]
     }
