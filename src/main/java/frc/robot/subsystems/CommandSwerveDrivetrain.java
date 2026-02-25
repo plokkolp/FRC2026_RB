@@ -172,7 +172,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public Rotation2d getOdomHeading() {
-    return Rotation2d.fromDegrees(getPigeon2().getYaw().getValueAsDouble());
+    return Rotation2d.fromDegrees(-getPigeon2().getYaw().getValueAsDouble());
   }
 
   public Rotation2d getTeleopHeading() {
@@ -214,16 +214,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     AutoBuilder.configure(
-        this::getPose,
-        this::resetPose,
-        this::getRobotRelativeSpeeds,
-        speeds -> setControl(m_pathApply.withSpeeds(speeds)), // PP 輸出是 robot-relative，別再轉一次
-        new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0),
-            new PIDConstants(5.0, 0.0, 0.0)),
-        config,
-        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-        this);
+    this::getPose,
+    this::resetPose,
+    this::getRobotRelativeSpeeds,
+    speeds -> {
+      // 只修正旋轉方向（若你現在是「旋轉反了」）
+      ChassisSpeeds fixed = new ChassisSpeeds(
+          speeds.vxMetersPerSecond,
+          speeds.vyMetersPerSecond,
+          -speeds.omegaRadiansPerSecond
+      );
+      setControl(m_pathApply.withSpeeds(fixed));
+    },
+    new PPHolonomicDriveController(
+        new PIDConstants(5.0, 0.0, 0.0),
+        new PIDConstants(5.0, 0.0, 0.0)),
+    config,
+    () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+    this
+);
   }
 
   @Override
