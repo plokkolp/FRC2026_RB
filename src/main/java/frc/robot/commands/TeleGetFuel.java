@@ -7,7 +7,7 @@ import frc.robot.subsystems.Intake;
 public class TeleGetFuel extends Command {
 
   private final Intake intake;
-  // private final XboxController controller;
+    private final XboxController controller;
 
 
   private static final double POS_DOWN = 14.81;
@@ -16,9 +16,9 @@ public class TeleGetFuel extends Command {
 
   private boolean retracting; 
 
-  public TeleGetFuel(Intake intake) {
+  public TeleGetFuel(Intake intake,XboxController controller) {
     this.intake = intake;
-    // this.controller = controller;
+    this.controller = controller;
     addRequirements(intake);
   }
 
@@ -40,16 +40,7 @@ public class TeleGetFuel extends Command {
 
   @Override
   public void execute() {
-    // if(controller.getAButton()){
-    //         intake.setAnglePositionRot(9);}
-    //         else{
-    //           intake.setAnglePositionRot(POS_DOWN);
-
-    //         }
-
-
-    }
-  
+  }
 
   @Override
   public void end(boolean interrupted) {
