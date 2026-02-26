@@ -2,7 +2,6 @@ package frc.robot.commands.Auto;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
@@ -20,7 +19,6 @@ public class AutoShoot extends Command {
 
   private static final double kTrainDuty = -0.7;
   private static final double kIntakeDuty = 0.85;
-  private static final double kFireTrig = 0.3;
 
   private static final boolean kGateByRPM = false;
   private static final double kRpmTol = 120.0;

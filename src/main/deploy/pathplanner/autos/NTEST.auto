@@ -17,22 +17,29 @@
               {
                 "type": "wait",
                 "data": {
-                  "waitTime": 1.2
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": null
+                  "waitTime": 2.0
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "race",
           "data": {
-            "pathName": "right LOOK1"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "right LOOK1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "DOWN"
+                }
+              }
+            ]
           }
         },
         {
@@ -51,6 +58,12 @@
           "type": "path",
           "data": {
             "pathName": "RIGHT LOOK 4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter"
           }
         }
       ]

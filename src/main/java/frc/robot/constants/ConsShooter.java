@@ -13,8 +13,8 @@ public final class ConsShooter {
 
   public static final int ANGLE_MOTOR_ID = 24;
   public static final int ANGLE_CANCODER_ID = 25;
-  public static final double YAW_MIN_ROT = -0.355;
-  public static final double YAW_MAX_ROT =  0.266846;
+  public static final double YAW_MIN_ROT = -0.8;
+  public static final double YAW_MAX_ROT =  0.8;
 
   public static final int MINION_MOTOR_ID = 20;
 
@@ -56,13 +56,13 @@ public final class ConsShooter {
 
   private static final Slot0Configs ANGLE_POS_SLOT0 =
       new Slot0Configs()
-          .withKP(1)
+          .withKP(2.5)
           .withKI(0.0)
           .withKD(0.1);
 
   static {
 
-    ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.35+0.1123046875+0.188720703125;
+    ANGLE_CANCODER_CONFIG.MagnetSensor.MagnetOffset = 0.2287597;
 
     ANGLE_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     ANGLE_MOTOR_CONFIG.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -71,10 +71,10 @@ public final class ConsShooter {
     ANGLE_MOTOR_CONFIG.Feedback.FeedbackSensorSource   = FeedbackSensorSourceValue.FusedCANcoder;
 
     ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 200.0 / 7.0;
-ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio = 1.0;
+    ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio = 1.0;
 
-ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
     ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.8;
     ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.8;
@@ -100,7 +100,6 @@ ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
   static {
     MINION_MOTOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     MINION_MOTOR_CONFIG.Voltage = MINION_VOLT_LIMIT;
-
     MINION_MOTOR_CONFIG.Slot0 = MINION_POS_SLOT0;
   }
 

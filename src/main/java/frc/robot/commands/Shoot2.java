@@ -50,7 +50,7 @@ public class Shoot2 extends Command {
   @Override
   public void execute() {
 
-    boolean lbHeld = controller.getLeftBumperButton();
+    boolean lbHeld = controller.getYButton();
     double rx = controller.getRightX(); 
     if (lbHeld) {
 

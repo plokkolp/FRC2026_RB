@@ -8,7 +8,6 @@ public class AutoGetFuelDown extends Command {
   private final Intake intake;
 
   private static final double POS_DOWN = 14.81;
-  private static final double TOLERANCE = 1.0;
 
   public AutoGetFuelDown(Intake intake) {
     this.intake = intake;

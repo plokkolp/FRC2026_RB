@@ -252,7 +252,6 @@ public class Shooter extends SubsystemBase {
       lastSeenTimeSec = now;
       txEverValid = true;
 
-      //遠快追
       txFilteredDeg = (1.0 - kTxAlpha) * txFilteredDeg + kTxAlpha * rawTx;
     } else {
       //跳變
@@ -268,8 +267,9 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("LL/tx_hold_active",
         txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec);
 
-        SmartDashboard.putNumber("Yaw/MotorPositionRot", getYawMotorPositionRot());
-SmartDashboard.putNumber("Yaw/CANCoderAbs", getYawAbsRot());
-SmartDashboard.putNumber("Yaw/CANCoderNoOffset", getYawCanNoOffsetRot());
+    SmartDashboard.putNumber("Yaw/MotorPositionRot", getYawMotorPositionRot());
+    SmartDashboard.putNumber("Yaw/CANCoderAbs", getYawAbsRot());
+    SmartDashboard.putNumber("Yaw/CANCoderNoOffset", getYawCanNoOffsetRot());
+    SmartDashboard.putNumber("Pitch", getPitchPositionRot());
   }
 }

@@ -25,7 +25,7 @@ public class Climb extends Command {
   public void execute() {
     
     if(controller.getXButtonPressed()){
-       climber.setPosition(-110);
+       climber.setPosition(-145);
     }
   }
 

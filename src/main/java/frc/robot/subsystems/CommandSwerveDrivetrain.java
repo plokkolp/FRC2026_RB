@@ -236,7 +236,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   @Override
   public void periodic() {
-    // 里程計更新：永遠用乾淨 odom heading
     m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
     // SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
