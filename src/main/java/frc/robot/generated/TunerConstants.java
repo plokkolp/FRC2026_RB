@@ -53,7 +53,7 @@ public class TunerConstants {
 
     public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
 
-    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.96);
+    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5);//5.96
 
     private static final double kCoupleRatio = 3.125;
     private static final double kDriveGearRatio = 5.357142857142857;

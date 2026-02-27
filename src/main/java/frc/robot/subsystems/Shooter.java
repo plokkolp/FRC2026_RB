@@ -207,6 +207,10 @@ public class Shooter extends SubsystemBase {
     minionMotor.stopMotor();
   }
 
+  public void stopAngle() {
+    angleMotor.stopMotor();
+  }
+
   public void stopAll() {
     stopShooter();
     stopTrain();

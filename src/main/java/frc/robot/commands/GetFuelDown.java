@@ -9,7 +9,7 @@ public class GetFuelDown extends Command {
   private final Intake intake;
   private final XboxController controller;
 
-  private static final double POS_DOWN = 14.81;
+  private static final double POS_DOWN = 14.83;
 
   public GetFuelDown(Intake intake, XboxController controller) {
     this.intake = intake;

@@ -196,7 +196,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void autoSeedFieldCentric() {
     double angle = (m_allianceSupplier != null && m_allianceSupplier.get()) ? 180.0 : 0.0;
 
-    // 因為 getOdomHeading() 會反號，所以 setYaw 也反號一次
     getPigeon2().setYaw(-angle);
 
     Pose2d cur = getPose();
@@ -238,9 +237,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void periodic() {
     m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
-    // SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
-    // SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
-    // SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
+    SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
+    SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
+    SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
     // SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
     // SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());

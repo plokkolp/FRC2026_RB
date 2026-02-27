@@ -20,7 +20,7 @@ public class Shoot2 extends Command {
   private static final double kMaxValidTxDeg = 30.0;
 
   private static final double kTrainDuty = -0.7;
-  private static final double kIntakeDuty = 0.85;
+  private static final double kIntakeDuty = -0.7;
   private static final double kFireTrig = 0.3;
 
   private static final boolean kGateByRPM = false;

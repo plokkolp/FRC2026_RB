@@ -27,11 +27,16 @@ public class FuelGoBack extends Command {
     if(controller.getRightTriggerAxis() > 0.3){
       m_shooter.setPitchPosition(-2.11);
       
-      if(m_shooter.getPitchPositionRot() < -2){
+      if(m_shooter.getPitchPositionRot() < -1.7){
       m_shooter.setTrainSpeed(-0.7);
-      m_shooter.setIntaketrainSpeed(0.85);
+      m_shooter.setIntaketrainSpeed(-0.7);
       }
-    } else{
+
+    } else if(controller.getLeftTriggerAxis() > 0.3){
+           
+      m_shooter.setTrainSpeed(0.7);
+    }else{
+      
       m_shooter.setPitchPosition(-0.25);
       m_shooter.setTrainSpeed(0);
       m_shooter.setIntaketrainSpeed(0);
@@ -42,6 +47,7 @@ public class FuelGoBack extends Command {
    @Override
   public void end(boolean interrupted) {
     m_shooter.stopShooter();
+    m_shooter.stopAngle();
     m_shooter.setTrainSpeed(0);
     m_shooter.setIntaketrainSpeed(0);
   }
