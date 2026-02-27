@@ -22,7 +22,7 @@ public class AlignRightUntilTxZero extends Command {
 
   private static final double kHeadingRangeDeg = -5.0;
 
-  private static final double kHeadingKp = 0.02;     // 你目前用 1（OK，但通常會偏大）
+  private static final double kHeadingKp = 0.1;     // 你目前用 1（OK，但通常會偏大）
   private static final double kMaxOmegaRad = 2;   // 最大角速度 rad/s
   private static final double kMinOmegaRad = 0.25;  // 最小角速度 rad/s（避免卡住不轉）
 
@@ -53,7 +53,6 @@ public class AlignRightUntilTxZero extends Command {
     if (Math.abs(errDeg) > kHeadingRangeDeg) {
       omegaRadPerSec =
           Math.copySign(Math.max(Math.abs(omegaRadPerSec), kMinOmegaRad), omegaRadPerSec);
-          headingInRange = true;
     } else {
       headingInRange = true;
     }
