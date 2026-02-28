@@ -83,22 +83,18 @@ public class RobotContainer {
     // .toggleOnTrue(new ShooterMaster(m_shooter));
 //====================================================================//
     
-    new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-        .toggleOnTrue(new Shoot2(m_shooter, operator, driver));
+    // new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+    //     .toggleOnTrue(new Shoot2(m_shooter, operator, driver));
 
-    new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
-        .toggleOnTrue(new Climb(m_Climber, driver));
+    // new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
+    //     .toggleOnTrue(new Climb(m_Climber, driver));
 
-    new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
-        .toggleOnTrue(new FuelGoBack(m_shooter, driver));
+    // new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
+    //     .toggleOnTrue(new FuelGoBack(m_shooter, driver));
    
-    // new JoystickButton(driver,ConsController.Button.BUTTON_C.id)
-    //   .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
-    //     drivetrain::seedFieldCentric, drivetrain));
-
-    new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
-        .toggleOnTrue(new AlignRightUntilTxZero(drivetrain,m_shooter));
-
+    new JoystickButton(driver,ConsController.Button.BUTTON_C.id)
+      .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
+        drivetrain::seedFieldCentric, drivetrain));
 //
     new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
         .toggleOnTrue(new GetFuelDown(m_intake, operator));
@@ -121,7 +117,11 @@ public class RobotContainer {
     // new JoystickButton(testJoy, ConsController.Button.BUTTON_A.id)
     // .onTrue(edu.wpi.first.wpilibj2.command.Commands.print("A pressed"));
     
+// new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
+//     .onTrue(new AlignTheta(drivetrain,+12));
 
+new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+    .onTrue(new AlignToPose(drivetrain));
   }
 
   private void setDefaultCommand() {
