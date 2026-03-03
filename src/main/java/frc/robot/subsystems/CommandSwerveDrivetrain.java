@@ -215,8 +215,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         this::getPose,
         this::resetPose,
         this::getRobotRelativeSpeeds,
-        speeds -> setControl(m_pathApply.withSpeeds(speeds)), // PP gives robot-relative speeds
-        new PPHolonomicDriveController(
+speeds -> {
+  ChassisSpeeds fixed = new ChassisSpeeds(
+      speeds.vxMetersPerSecond,
+      speeds.vyMetersPerSecond,
+      -speeds.omegaRadiansPerSecond   // ← 只把旋轉加負號
+  );
+  setControl(m_pathApply.withSpeeds(fixed));
+},        new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0),
             new PIDConstants(5.0, 0.0, 0.0)),
         config,
