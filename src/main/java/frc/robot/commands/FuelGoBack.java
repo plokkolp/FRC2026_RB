@@ -15,11 +15,11 @@ public class FUELGOBACK extends Command {
   private static final double kEnableRangeDeg = 60.0;
 
   // ===== 砲台校正參數 =====
-  private static final double kCenterRot = -1.0177; // TODO: 你實測中心
+  private static final double kCenterRot = -0.28857421875; // TODO: 你實測中心
   private static final double kRotPerDeg = 0.0171;  // rot / deg
 
   // ===== 機械極限 =====
-  private static final double kMinRot = -2.20; // TODO: 你實測最左
+  private static final double kMinRot = -1.3525390625; // TODO: 你實測最左
   private static final double kMaxRot = -0.20; // TODO: 你實測最右
 
   // ===== 控制參數 =====

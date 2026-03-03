@@ -235,7 +235,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setIntaketrainSpeed(double speed) {
-    motor.set(speed);
+    motor.set(-speed);
   }
 
   public double getlong() {

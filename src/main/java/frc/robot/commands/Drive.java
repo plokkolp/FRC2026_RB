@@ -25,7 +25,7 @@ public class Drive extends Command {
 
   private static final double kDeadband = 0.08;
 
-  private static final double kMaxOmegaRadPerSec = 2.1 * Math.PI;
+  private static final double kMaxOmegaRadPerSec = 1 * Math.PI;
 
   public Drive(
       CommandSwerveDrivetrain drivetrain,
@@ -42,15 +42,15 @@ public class Drive extends Command {
   @Override
   public void execute() {
 
-    double xInput = -vX.getAsDouble();
-    double yInput = -vY.getAsDouble();
+    double xInput = vX.getAsDouble();
+    double yInput = vY.getAsDouble();
     double omegaInput = -vOmega.getAsDouble();
 
     double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
-    double xMps = xInput ;//* maxSpeedMps;
-    double yMps = yInput ;//* maxSpeedMps;
-    double omegaRadPerSec = omegaInput ;//* kMaxOmegaRadPerSec;
+    double xMps = xInput * maxSpeedMps;
+    double yMps = yInput * maxSpeedMps;
+    double omegaRadPerSec = omegaInput * kMaxOmegaRadPerSec;
 
     Rotation2d heading = drivetrain.getTeleopHeading();
 

@@ -35,7 +35,7 @@ public final class ConsIntake {
         .withInverted(InvertedValue.CounterClockwise_Positive);
 
     ANGLE_CONFIG.Slot0 = new Slot0Configs()
-    .withKP(4)
+    .withKP(5)
     .withKI(0);
     // .withKD(0.5)
     // .withKS(0.4)   

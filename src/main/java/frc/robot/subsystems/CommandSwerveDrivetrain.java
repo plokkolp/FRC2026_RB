@@ -216,7 +216,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       ChassisSpeeds fixed = new ChassisSpeeds(
           speeds.vxMetersPerSecond,
           speeds.vyMetersPerSecond,
-          -speeds.omegaRadiansPerSecond
+          speeds.omegaRadiansPerSecond
       );
       setControl(m_pathApply.withSpeeds(fixed));
     },
@@ -233,7 +233,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   public void periodic() {
     m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
-    SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
+    SmartDashboard.putNumber("DEBUG/GyroYaw_raw",getPigeon2().getYaw().getValueAsDouble());
     SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
     SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
