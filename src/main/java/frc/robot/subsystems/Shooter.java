@@ -42,13 +42,13 @@ public class Shooter extends SubsystemBase {
   private final PositionVoltage yawPos   = new PositionVoltage(0).withSlot(0);
   private final PositionVoltage pitchPos = new PositionVoltage(0).withSlot(0);
 
-  private double txFilteredDeg = 0.0;     // 給命令用（穩定/快速）
+  private double txFilteredDeg = 0.0;     
   private boolean txEverValid = false;
   private double lastSeenTimeSec = 0.0;
 
-  private static final double kTxAlpha = 0.5;        // 越大越快 (0~1)
-  private static final double kHoldTimeoutSec = 0.25; // 沒看到目標最多保留多久
-  private static final double kMaxAbsTxDeg = 35.0;    // 避免爆值
+  private static final double kTxAlpha = 0.5;        
+  private static final double kHoldTimeoutSec = 0.25; 
+  private static final double kMaxAbsTxDeg = 35.0;    
 
   public Shooter() {
 

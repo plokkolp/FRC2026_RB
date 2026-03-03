@@ -101,12 +101,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
-  // ===== Debug =====
   private int m_resetPoseCount = 0;
 
-  // =========================
-  // WPILib kinematics/odometry：+X 前、+Y 左
-  // =========================
   private static final Translation2d kFL =
       new Translation2d(Units.inchesToMeters(+14.75), Units.inchesToMeters(+12.75));
   private static final Translation2d kFR =
@@ -241,8 +237,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
     SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
-    // SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
-    // SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
+    SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
 
     // SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
     // SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);

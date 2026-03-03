@@ -73,8 +73,8 @@ public final class ConsShooter {
     ANGLE_MOTOR_CONFIG.Feedback.RotorToSensorRatio = 200.0 / 7.0;
     ANGLE_MOTOR_CONFIG.Feedback.SensorToMechanismRatio = 1.0;
 
-    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+    ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
     ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.8;
     ANGLE_MOTOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -0.8;

@@ -5,6 +5,7 @@ import java.util.Optional;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -25,7 +26,16 @@ public class Vision extends SubsystemBase {
   private static final double kRejectAvgDist = 7.0;
 
   private static final double kSingleTagMaxJumpM = 1.5;
-  private static final double kSingleTagMaxYawDeltaDeg = 45.0; 
+  private static final double kSingleTagMaxYawDeltaDeg = 45.0;
+
+  private Pose2d emaPose = null;
+  private double lastEmaTs = 0.0;
+
+  private static final double kEmaTauSecMulti = 0.15;  // 高改
+  private static final double kEmaTauSecSingle = 0.30; 
+
+  private static final double kAlphaMin = 0.02;
+  private static final double kAlphaMax = 0.40;
 
   private boolean hasHardSeededPose = false;
 
@@ -74,6 +84,7 @@ public class Vision extends SubsystemBase {
     SmartDashboard.putNumber("Vision/YawDeltaDeg", yawDeltaDeg);
     SmartDashboard.putBoolean("Vision/HardSeeded", hasHardSeededPose);
 
+    // 規則 1：尚未 hard seed 時，只要 MultiTag 就硬重設一次 + 融合
     if (!hasHardSeededPose && c.tagCount >= kMinTagsForMultiTag) {
       SmartDashboard.putString("Vision/Gate", "HARDSEED_MULTITAG");
       hardSeedOnce(c);
@@ -127,10 +138,11 @@ public class Vision extends SubsystemBase {
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
-   PoseEstimate pe =
-    isRed
-        ? LimelightHelpers.getBotPoseEstimate_wpiBlue(kLLName) 
-        : LimelightHelpers.getBotPoseEstimate_wpiRed(kLLName);  
+    // 你原本的寫法我先照留（如果你發現紅藍對調，再把兩個呼叫交換）
+    PoseEstimate pe =
+        isRed
+            ? LimelightHelpers.getBotPoseEstimate_wpiBlue(kLLName)
+            : LimelightHelpers.getBotPoseEstimate_wpiRed(kLLName);
 
     if (pe == null || pe.tagCount <= 0) return Optional.empty();
 
@@ -149,8 +161,13 @@ public class Vision extends SubsystemBase {
 
   private void hardSeedOnce(Candidate c) {
     if (hasHardSeededPose) return;
+
     drivetrain.resetPose(c.pose);
     hasHardSeededPose = true;
+
+    // hard seed 當下把 EMA 也初始化成同一筆，避免 EMA 把你拉回去
+    emaPose = c.pose;
+    lastEmaTs = c.timestamp;
 
     SmartDashboard.putNumber("Vision/HardSeedTs", Timer.getFPGATimestamp());
     SmartDashboard.putNumber("Vision/HardSeedX", c.pose.getX());
@@ -159,6 +176,9 @@ public class Vision extends SubsystemBase {
   }
 
   private void fuse(Candidate c) {
+
+    // ===== EMA 綠波：先把 vision pose 平滑後再丟給 estimator =====
+    Pose2d filteredPose = emaFilterPose(c.pose, c.timestamp, c.tagCount);
 
     double sx = 0.05;
     double sy = 0.05;
@@ -178,11 +198,51 @@ public class Vision extends SubsystemBase {
 
     Matrix<N3, N1> stdDevs = VecBuilder.fill(sx, sy, st);
 
-    drivetrain.addVisionMeasurement(c.pose, c.timestamp, stdDevs);
+    drivetrain.addVisionMeasurement(filteredPose, c.timestamp, stdDevs);
 
     SmartDashboard.putNumber("Vision/FuseStdX", sx);
     SmartDashboard.putNumber("Vision/FuseStdY", sy);
     SmartDashboard.putNumber("Vision/FuseStdDeg", Math.toDegrees(st));
+  }
+
+  private Pose2d emaFilterPose(Pose2d measurement, double ts, int tagCount) {
+    if (measurement == null) return measurement;
+
+    // 第一筆直接吃
+    if (emaPose == null) {
+      emaPose = measurement;
+      lastEmaTs = ts;
+
+      SmartDashboard.putNumber("Vision/EMA/Alpha", 1.0);
+      SmartDashboard.putNumber("Vision/EMA/X", emaPose.getX());
+      SmartDashboard.putNumber("Vision/EMA/Y", emaPose.getY());
+      SmartDashboard.putNumber("Vision/EMA/Deg", emaPose.getRotation().getDegrees());
+      return emaPose;
+    }
+
+    double dt = ts - lastEmaTs;
+    if (dt <= 0.0 || dt > 0.5) dt = 0.02; // 保底，避免 timestamp 跳太大
+
+    double tau = (tagCount >= kMinTagsForMultiTag) ? kEmaTauSecMulti : kEmaTauSecSingle;
+
+    // alpha = dt / (tau + dt)
+    double alpha = dt / (tau + dt);
+    alpha = clamp(alpha, kAlphaMin, kAlphaMax);
+
+    double x = emaPose.getX() + alpha * (measurement.getX() - emaPose.getX());
+    double y = emaPose.getY() + alpha * (measurement.getY() - emaPose.getY());
+
+    Rotation2d r = emaPose.getRotation().interpolate(measurement.getRotation(), alpha);
+
+    emaPose = new Pose2d(x, y, r);
+    lastEmaTs = ts;
+
+    SmartDashboard.putNumber("Vision/EMA/Alpha", alpha);
+    SmartDashboard.putNumber("Vision/EMA/X", emaPose.getX());
+    SmartDashboard.putNumber("Vision/EMA/Y", emaPose.getY());
+    SmartDashboard.putNumber("Vision/EMA/Deg", emaPose.getRotation().getDegrees());
+
+    return emaPose;
   }
 
   private static double clamp(double v, double lo, double hi) {
