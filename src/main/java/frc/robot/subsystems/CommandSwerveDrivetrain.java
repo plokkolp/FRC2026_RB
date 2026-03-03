@@ -167,6 +167,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     this.m_allianceSupplier = allianceSupplier;
   }
 
+  // ===== Heading (keep it clean; rely on Pigeon mount-pose for any physical rotation) =====
   public Rotation2d getOdomHeading() {
     return getPigeon2().getRotation2d();
   }
@@ -190,9 +191,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   }
 
   public void autoSeedFieldCentric() {
-    double angle = (m_allianceSupplier != null && m_allianceSupplier.get()) ? 180.0 : 0.0;
+    // Red = 180, Blue = 0
+    double angle = (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) ? 180.0 : 0.0;
 
-    getPigeon2().setYaw(-angle);
+    // keep it simple: make gyro yaw match the field-facing target
+    getPigeon2().setYaw(angle);
 
     Pose2d cur = getPose();
     Pose2d target = new Pose2d(cur.getTranslation(), Rotation2d.fromDegrees(angle));
@@ -209,39 +212,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     AutoBuilder.configure(
-    this::getPose,
-    this::resetPose,
-    this::getRobotRelativeSpeeds,
-    speeds -> {
-      ChassisSpeeds fixed = new ChassisSpeeds(
-          speeds.vxMetersPerSecond,
-          speeds.vyMetersPerSecond,
-          speeds.omegaRadiansPerSecond
-      );
-      setControl(m_pathApply.withSpeeds(fixed));
-    },
-    new PPHolonomicDriveController(
-        new PIDConstants(5.0, 0.0, 0.0),
-        new PIDConstants(5.0, 0.0, 0.0)),
-    config,
-    () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-    this
-);
+        this::getPose,
+        this::resetPose,
+        this::getRobotRelativeSpeeds,
+        speeds -> setControl(m_pathApply.withSpeeds(speeds)), // PP gives robot-relative speeds
+        new PPHolonomicDriveController(
+            new PIDConstants(5.0, 0.0, 0.0),
+            new PIDConstants(5.0, 0.0, 0.0)),
+        config,
+        () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, // keep red/blue
+        this);
   }
 
   @Override
   public void periodic() {
     m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
-    SmartDashboard.putNumber("DEBUG/GyroYaw_raw",getPigeon2().getYaw().getValueAsDouble());
+    SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
     SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
     SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
     SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
     SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
-
-    // SmartDashboard.putBoolean("DEBUG/DSDisabled", DriverStation.isDisabled());
-    // SmartDashboard.putNumber("DEBUG/ResetPoseCount", m_resetPoseCount);
 
     SmartDashboard.putNumber("Pose/X", getPose().getX());
     SmartDashboard.putNumber("Pose/Y", getPose().getY());
@@ -261,11 +253,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   @Override
   public void resetPose(Pose2d pose) {
     m_resetPoseCount++;
-
-    // SmartDashboard.putNumber("DEBUG/LastReset_X", pose.getX());
-    // SmartDashboard.putNumber("DEBUG/LastReset_Y", pose.getY());
-    // SmartDashboard.putNumber("DEBUG/LastReset_Deg", pose.getRotation().getDegrees());
-
     m_poseEstimator.resetPosition(getOdomHeading(), getState().ModulePositions, pose);
   }
 

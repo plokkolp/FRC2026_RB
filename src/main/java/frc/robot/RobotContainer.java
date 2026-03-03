@@ -86,8 +86,8 @@ public class RobotContainer {
     new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
         .toggleOnTrue(new Shoot2(m_shooter, operator, driver));
 
-    new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
-        .toggleOnTrue(new Climb(m_Climber, driver));
+    // new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
+    //     .toggleOnTrue(new Climb(m_Climber, driver));
 
 //     new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
 //         .toggleOnTrue(new FuelGoBack(m_shooter, driver));
@@ -142,8 +142,8 @@ public class RobotContainer {
     drivetrain.setDefaultCommand(
         new Drive(
             drivetrain,
-            () -> -MathUtil.applyDeadband(-driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id), 0.06),
-            () -> +MathUtil.applyDeadband(+driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id), 0.06),
+            () -> +MathUtil.applyDeadband(-driver.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id), 0.06),
+            () -> -MathUtil.applyDeadband(+driver.getRawAxis(ConsController.Axis.LEFT_STICK_X.id), 0.06),
             () -> +MathUtil.applyDeadband(-driver.getRawAxis(ConsController.Axis.RIGHT_STICK_X.id), 0.06)));
 
     // m_shooter.setDefaultCommand(

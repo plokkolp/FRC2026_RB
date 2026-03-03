@@ -45,12 +45,13 @@ public class TunerConstants {
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     
-    private static final Pigeon2Configuration pigeonConfigs = null;
-//    private static final Pigeon2Configuration pigeonConfigs =
-//     new Pigeon2Configuration()
-//         .withMountPose(new MountPoseConfigs()
-//             .withMountPoseRoll(-180));   
-
+    // private static final Pigeon2Configuration pigeonConfigs = null;
+private static final Pigeon2Configuration pigeonConfigs =
+    new Pigeon2Configuration()
+        .withMountPose(
+            new MountPoseConfigs()
+                .withMountPoseYaw(180)
+        );
     public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
 
     public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5);//5.96
