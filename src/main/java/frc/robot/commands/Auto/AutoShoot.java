@@ -18,7 +18,7 @@ public class AutoShoot extends Command {
   private static final double kMaxValidTxDeg = 30.0;
 
   private static final double kTrainDuty = -0.7;
-  private static final double kIntakeDuty = 0.85;
+  private static final double kIntakeDuty =-0.7;
 
   private static final boolean kGateByRPM = false;
   private static final double kRpmTol = 120.0;
