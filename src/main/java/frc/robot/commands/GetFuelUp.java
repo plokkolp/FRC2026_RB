@@ -7,7 +7,7 @@ public class GetFuelUp extends Command {
 
   private final Intake intake;
 
-  private static final double POS_UP = 0.0;
+  private static final double POS_UP = 0;
   private static final double TOLERANCE = 1.2;
 
   public GetFuelUp(Intake intake) {

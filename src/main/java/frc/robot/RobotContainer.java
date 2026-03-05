@@ -83,24 +83,25 @@ public class RobotContainer {
     // .toggleOnTrue(new ShooterMaster(m_shooter));
 //====================================================================//
     
-    // new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
-    //     .toggleOnTrue(new Shoot2(m_shooter, operator, driver));
+    new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+        .toggleOnTrue(new Shoot2(m_shooter, operator, driver));
 
     // new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
     //     .toggleOnTrue(new Climb(m_Climber, driver));
 
-//     new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
-//         .toggleOnTrue(new FuelGoBack(m_shooter, driver));
+    new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+        .toggleOnTrue(new FUELGOBACK(m_shooter,drivetrain,driver));
    
-//     new JoystickButton(driver,ConsController.Button.BUTTON_C.id)
-//       .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
-//         drivetrain::seedFieldCentric, drivetrain));
-// //
-//     new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
-//         .toggleOnTrue(new GetFuelDown(m_intake, operator));
+    new JoystickButton(driver,ConsController.Button.BUTTON_C.id)
+      .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
+        drivetrain::seedFieldCentric, drivetrain));
+//
+    new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
+        .toggleOnTrue(new GetFuelDown(m_intake, operator,driver));
 
-//     new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
-//         .toggleOnTrue(new GetFuelUp(m_intake));
+    new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
+        .toggleOnTrue(new GetFuelUp(m_intake));
+
       
 //====================================================================//
 
@@ -154,12 +155,12 @@ public class RobotContainer {
     //             0.1),
     //         () -> TT.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id)));
 
-    m_intake.setDefaultCommand(
-        new IntakeTest(
-            m_intake,m_shooter,                                         ccc
-            () -> TT.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id),   //INTAKE上下角度
-            () -> -TT.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id), //按右邊的板機(寫R2的那個) 兩個傳輸加砲台一起轉
-            () -> TT.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id)));//純INTAKE 管旋轉
+    // m_intake.setDefaultCommand(
+    //     new IntakeTest(
+    //         m_intake,m_shooter,                                         //灌程式 搖桿4號
+    //         () -> TT.getRawAxis(ConsController.Axis.LEFT_STICK_Y.id),   //INTAKE上下角度
+    //         () -> -TT.getRawAxis(ConsController.Axis.RIGHT_TRIGGER.id), //按右邊的板機(寫R2的那個) 兩個傳輸加砲台一起轉
+    //         () -> TT.getRawAxis(ConsController.Axis.RIGHT_STICK_Y.id)));//純INTAKE 管旋轉
 
     // m_shooter.setDefaultCommand(
     // new ShooterTest(

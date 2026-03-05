@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -10,37 +11,36 @@ public class FUELGOBACK extends Command {
 
   private final Shooter shooter;
   private final CommandSwerveDrivetrain drivetrain;
+  private final XboxController driver;
 
-  // ===== 只在 ±60° 內啟用 =====
-  private static final double kEnableRangeDeg = 60.0;
 
-  // ===== 砲台校正參數 =====
-  private static final double kCenterRot = -0.28857421875; // TODO: 你實測中心
-  private static final double kRotPerDeg = 0.0171;  // rot / deg
+  private static final double kEnableRangeDeg = 90;
 
-  // ===== 機械極限 =====
-  private static final double kMinRot = -1.3525390625; // TODO: 你實測最左
-  private static final double kMaxRot = -0.20; // TODO: 你實測最右
 
-  // ===== 控制參數 =====
+  private static final double kCenterRot = -0.295654296875-0.147949218750+0.25; //middle -0.147705078125
+  private static final double kRotPerDeg = 0.01607;  // rot / deg
+
+
+  private static final double kMinRot = -1.759521484375-0.147949218750+0.25; // min(left)
+  private static final double kMaxRot =  1.13330078125-0.147949218750+0.25; // max(right)
+
   private static final double kP = 0.8;
   private static final double kMaxOut = 0.25;
   private static final double kTolRot = 0.01;
 
-  public FUELGOBACK(Shooter shooter, CommandSwerveDrivetrain drivetrain) {
+  public FUELGOBACK(Shooter shooter, CommandSwerveDrivetrain drivetrain,XboxController driver) {
     this.shooter = shooter;
     this.drivetrain = drivetrain;
+    this.driver = driver;
     addRequirements(shooter);
   }
 
   @Override
   public void execute() {
 
-    // 1️⃣ 底盤場地角度
     double poseDeg = drivetrain.getState().Pose.getRotation().getDegrees();
     poseDeg = MathUtil.inputModulus(poseDeg, -180.0, 180.0);
 
-    // 2️⃣ 啟用條件：只在 ±60° 內
     boolean enabled = Math.abs(poseDeg) <= kEnableRangeDeg;
 
     double curRot = shooter.getYawMotorPositionRot();
@@ -51,12 +51,10 @@ public class FUELGOBACK extends Command {
 
     if (enabled) {
 
-      // 鎖場地 0°
       desiredDeg = poseDeg;
 
       targetRot = kCenterRot + desiredDeg * kRotPerDeg;
 
-      // 機械限制
       targetRot = MathUtil.clamp(targetRot, kMinRot, kMaxRot);
 
       errRot = targetRot - curRot;
@@ -69,11 +67,33 @@ public class FUELGOBACK extends Command {
 
       shooter.setYawSpeed(out);
 
+      if(driver.getRightTriggerAxis() > 0.3){
+    
+        shooter.setPitchPosition(-2.45);
+        if(shooter.getPitchPositionRot() < -2.1){
+          shooter.setShooterSpeed(0.9);
+          shooter.setIntaketrainSpeed(-0.7);
+          shooter.setTrainSpeed(-0.7);
+          
+        } else{
+         shooter.setShooterSpeed(0);
+          shooter.setIntaketrainSpeed(0);
+          shooter.setTrainSpeed(0);
+
+        }
+      }else{
+      shooter.setPitchPosition(-0.23);
+      shooter.setShooterSpeed(0);
+      shooter.setIntaketrainSpeed(0);
+      shooter.setTrainSpeed(0);
+
+
+      }
+
     } else {
       shooter.setYawSpeed(0.0);
     }
 
-    // ===== Dashboard =====
     SmartDashboard.putBoolean("FUELGOBACK/Enabled", enabled);
     SmartDashboard.putNumber("FUELGOBACK/PoseDeg", poseDeg);
     SmartDashboard.putNumber("FUELGOBACK/DesiredDeg", desiredDeg);

@@ -42,8 +42,8 @@ public class Drive extends Command {
   @Override
   public void execute() {
 
-    double xInput = vX.getAsDouble();
-    double yInput = vY.getAsDouble();
+    double xInput = -vX.getAsDouble();
+    double yInput = -vY.getAsDouble();
     double omegaInput = -vOmega.getAsDouble();
 
     double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);

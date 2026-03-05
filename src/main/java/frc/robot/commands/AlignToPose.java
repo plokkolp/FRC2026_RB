@@ -19,7 +19,7 @@ public class AlignToPose extends Command {
   private final CommandSwerveDrivetrain drivetrain;
 
   private static final Pose2d kTargetBlue =
-      new Pose2d(14.65, 4.51, Rotation2d.fromDegrees(180.0));
+      new Pose2d(14.65, 4.51, Rotation2d.fromDegrees(0.0));
 
   private final PIDController xPid = new PIDController(2, 0.0, 0.0);
   private final PIDController yPid = new PIDController(2, 0.0, 0.0);
