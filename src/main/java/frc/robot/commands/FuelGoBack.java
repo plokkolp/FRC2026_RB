@@ -18,7 +18,7 @@ public class FUELGOBACK extends Command {
 
 
   private static final double kCenterRot = -0.295654296875-0.147949218750+0.25; //middle -0.147705078125
-  private static final double kRotPerDeg = 0.01607;  // rot / deg
+  private static final double kRotPerDeg = -0.01607;  // rot / deg
 
 
   private static final double kMinRot = -1.759521484375-0.147949218750+0.25; // min(left)
@@ -38,10 +38,10 @@ public class FUELGOBACK extends Command {
   @Override
   public void execute() {
 
-    double poseDeg = drivetrain.getState().Pose.getRotation().getDegrees();
-    poseDeg = MathUtil.inputModulus(poseDeg, -180.0, 180.0);
+double poseDeg = drivetrain.getState().Pose.getRotation().getDegrees();
+poseDeg = MathUtil.inputModulus(poseDeg, -180.0, 180.0);
 
-    boolean enabled = Math.abs(poseDeg) <= kEnableRangeDeg;
+boolean enabled = Math.abs(poseDeg) >= kEnableRangeDeg;
 
     double curRot = shooter.getYawMotorPositionRot();
     double desiredDeg = 0.0;
@@ -51,13 +51,14 @@ public class FUELGOBACK extends Command {
 
     if (enabled) {
 
-      desiredDeg = poseDeg;
+       desiredDeg = 180.0 - poseDeg;
+  desiredDeg = MathUtil.inputModulus(desiredDeg, -180.0, 180.0);
 
-      targetRot = kCenterRot + desiredDeg * kRotPerDeg;
+  targetRot = kCenterRot + desiredDeg * kRotPerDeg;
 
-      targetRot = MathUtil.clamp(targetRot, kMinRot, kMaxRot);
+  targetRot = MathUtil.clamp(targetRot, kMinRot, kMaxRot);
 
-      errRot = targetRot - curRot;
+  errRot = targetRot - curRot;
 
       if (Math.abs(errRot) < kTolRot) {
         out = 0.0;
@@ -93,15 +94,7 @@ public class FUELGOBACK extends Command {
     } else {
       shooter.setYawSpeed(0.0);
     }
-
-    SmartDashboard.putBoolean("FUELGOBACK/Enabled", enabled);
-    SmartDashboard.putNumber("FUELGOBACK/PoseDeg", poseDeg);
-    SmartDashboard.putNumber("FUELGOBACK/DesiredDeg", desiredDeg);
-    SmartDashboard.putNumber("FUELGOBACK/TurretCurRot", curRot);
-    SmartDashboard.putNumber("FUELGOBACK/TurretTargetRot", targetRot);
-    SmartDashboard.putNumber("FUELGOBACK/ErrRot", errRot);
-    SmartDashboard.putNumber("FUELGOBACK/Output", out);
-  }
+   }
 
   @Override
   public boolean isFinished() {

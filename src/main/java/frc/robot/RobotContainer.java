@@ -86,8 +86,8 @@ public class RobotContainer {
     new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
         .toggleOnTrue(new Shoot2(m_shooter, operator, driver));
 
-    // new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
-    //     .toggleOnTrue(new Climb(m_Climber, driver));
+    new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
+        .toggleOnTrue(new Climb(m_Climber, driver));
 
     new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
         .toggleOnTrue(new FUELGOBACK(m_shooter,drivetrain,driver));
