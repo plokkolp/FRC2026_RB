@@ -119,10 +119,21 @@ public class Shoot2 extends Command {
     if (allowFeed) {
       shooter.setTrainSpeed(kTrainDuty);
       shooter.setIntaketrainSpeed(kIntakeDuty);
-    } else {
+    } else if(drive.getLeftTriggerAxis() > 0.4){
+      shooter.setTrainSpeed(-kTrainDuty);
+      shooter.setIntaketrainSpeed(-kIntakeDuty);
+    } else{
       shooter.setTrainSpeed(0);
       shooter.setIntaketrainSpeed(0);
     }
+
+    // if(drive.getLeftTriggerAxis() > 0.4){
+    //   shooter.setTrainSpeed(-kTrainDuty);
+    //   shooter.setIntaketrainSpeed(-kIntakeDuty);
+    // } else {
+    //   shooter.setTrainSpeed(0);
+    //   shooter.setIntaketrainSpeed(0);
+    // }
   }
 
   @Override

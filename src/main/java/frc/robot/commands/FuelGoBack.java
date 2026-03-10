@@ -17,7 +17,7 @@ public class FUELGOBACK extends Command {
   private static final double kEnableRangeDeg = 90;
 
 
-  private static final double kCenterRot = -0.295654296875-0.147949218750+0.25; //middle -0.147705078125
+  private static final double kCenterRot = -0.147705078125; //middle -0.147705078125
   private static final double kRotPerDeg = -0.01607;  // rot / deg
 
 
@@ -72,7 +72,7 @@ boolean enabled = Math.abs(poseDeg) >= kEnableRangeDeg;
     
         shooter.setPitchPosition(-2.45);
         if(shooter.getPitchPositionRot() < -2.1){
-          shooter.setShooterSpeed(0.9);
+          shooter.setShooterSpeed(0.4);
           shooter.setIntaketrainSpeed(-0.7);
           shooter.setTrainSpeed(-0.7);
           

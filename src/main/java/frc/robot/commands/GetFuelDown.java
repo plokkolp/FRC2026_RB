@@ -44,7 +44,8 @@ public class GetFuelDown extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    intake.setRolling(0.9);
+    intake.setRolling(0);
+
   }
 
   @Override

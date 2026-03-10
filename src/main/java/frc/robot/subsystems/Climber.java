@@ -49,9 +49,9 @@ public class Climber extends SubsystemBase {
 
    @Override
   public void periodic() {
-    // SmartDashboard.putNumber("climber/ALL", getAveragePosition());
-    // SmartDashboard.putNumber("climber/Right", getRightPosition());
-    // SmartDashboard.putNumber("climber/Left", getLeftPosition());
+    SmartDashboard.putNumber("climber/ALL", getAveragePosition());
+    SmartDashboard.putNumber("climber/Right", getRightPosition());
+    SmartDashboard.putNumber("climber/Left", getLeftPosition());
 
   }
 }
