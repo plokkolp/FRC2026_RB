@@ -18,7 +18,7 @@ public final class ConsClimber {
     RIGHT_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     LEFT_CONFIG.MotorOutput.Inverted  = InvertedValue.CounterClockwise_Positive;
-    RIGHT_CONFIG.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    RIGHT_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     Slot0Configs slot0 = new Slot0Configs()
         .withKP(1)

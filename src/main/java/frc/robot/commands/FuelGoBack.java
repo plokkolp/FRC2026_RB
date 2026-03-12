@@ -72,7 +72,7 @@ boolean enabled = Math.abs(poseDeg) >= kEnableRangeDeg;
     
         shooter.setPitchPosition(-2.45);
         if(shooter.getPitchPositionRot() < -2.1){
-          shooter.setShooterSpeed(0.4);
+          shooter.setShooterSpeed(0.9);
           shooter.setIntaketrainSpeed(-0.7);
           shooter.setTrainSpeed(-0.7);
           

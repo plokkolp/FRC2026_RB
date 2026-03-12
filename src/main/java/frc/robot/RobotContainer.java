@@ -89,17 +89,17 @@ public class RobotContainer {
     new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
         .toggleOnTrue(new Climb(m_Climber, driver));
 
-    // new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
-    //     .toggleOnTrue(new FUELGOBACK(m_shooter,drivetrain,driver));
+    new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+         .toggleOnTrue(new FUELGOBACK(m_shooter,drivetrain,driver));
    
     new JoystickButton(driver,ConsController.Button.BUTTON_C.id)
       .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
         drivetrain::seedFieldCentric, drivetrain));
 // 
-    new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
+    new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
         .toggleOnTrue(new GetFuelDown(m_intake, operator,driver));
 
-    new JoystickButton(driver, ConsController.Button.BUTTON_LB.id)
+    new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
         .toggleOnTrue(new GetFuelUp(m_intake));
 
       
