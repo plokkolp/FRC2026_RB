@@ -14,8 +14,7 @@ public class AutoClimber extends Command {
 
 @Override
   public void initialize() {
-   climber.setPosition(-110);
-
+   climber.setPosition(-47.8);
   }
 
   @Override
@@ -25,7 +24,7 @@ public class AutoClimber extends Command {
 
   @Override
   public void end(boolean interrupted) {
-
+   climber.setPosition(-135);
   }
 
   @Override

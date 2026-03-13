@@ -184,6 +184,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Climber", new AutoClimber(m_Climber));
     NamedCommands.registerCommand("UP", new AutoGetFuelUp(m_intake));
     NamedCommands.registerCommand("DOWN", new AutoGetFuelDown(m_intake));
+    NamedCommands.registerCommand("Climb", new AlignToPose(drivetrain));
+    
 
   }
 }

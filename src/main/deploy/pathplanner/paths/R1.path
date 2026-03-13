@@ -28,16 +28,7 @@
       "linkedName": "R1E"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.23002421307506016,
-      "rotationDegrees": -90.0
-    },
-    {
-      "waypointRelativePos": 0.5754884547069273,
-      "rotationDegrees": -135.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -57,7 +48,7 @@
   "folder": "0227",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
