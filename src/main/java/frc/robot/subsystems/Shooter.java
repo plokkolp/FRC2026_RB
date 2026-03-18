@@ -28,7 +28,7 @@ public class Shooter extends SubsystemBase {
 
   private final TalonFX minionMotor = new TalonFX(ConsShooter.MINION_MOTOR_ID); // Pitch
 
-  private final LL4 ll4 = new LL4("limelight-shoot");
+  private final LL4 ll4 = new LL4("limelight-shooter");
 
   private final SparkFlex motor = new SparkFlex(51, MotorType.kBrushless);
 
