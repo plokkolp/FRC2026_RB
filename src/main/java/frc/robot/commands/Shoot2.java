@@ -141,6 +141,7 @@ public class Shoot2 extends Command {
     shooter.setYawSpeed(0);
     shooter.setTrainSpeed(0);
     shooter.setIntaketrainSpeed(0);
+    shooter.stopPitch();
     shooter.stopShooter();
   }
 

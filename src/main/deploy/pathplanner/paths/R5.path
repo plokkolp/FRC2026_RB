@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.73,
-        "y": 0.59
+        "x": 3.611,
+        "y": 0.554
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.1534576234683307,
-        "y": 0.6466316231594581
+        "x": 2.034457623468331,
+        "y": 0.6106316231594582
       },
       "isLocked": false,
       "linkedName": "R4E"
     },
     {
       "anchor": {
-        "x": 0.5605000000000002,
-        "y": 0.6695526315789482
+        "x": 0.5048070175438597,
+        "y": 0.6297719298245625
       },
       "prevControl": {
-        "x": 3.33719298245614,
-        "y": 0.5899912280701767
+        "x": 3.2814999999999976,
+        "y": 0.550210526315791
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.8,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 3.1,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -50,5 +50,5 @@
     "velocity": 1.0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

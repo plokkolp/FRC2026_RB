@@ -55,41 +55,15 @@
           }
         },
         {
-          "type": "race",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "R5"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shooter"
-                }
-              }
-            ]
+            "pathName": "R5"
           }
         },
         {
-          "type": "race",
+          "type": "wait",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shooter"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 3.0
-                }
-              }
-            ]
+            "waitTime": 2.0
           }
         },
         {
@@ -99,28 +73,9 @@
           }
         },
         {
-          "type": "race",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Climber"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Climb"
-                }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 3.5
-                }
-              }
-            ]
+            "name": "Shooter"
           }
         }
       ]

@@ -221,15 +221,15 @@ public double getDistanceMeters() {
 
   @Override
   public void periodic() {
-    // SmartDashboard.putString("LL4/Name", name);
+    SmartDashboard.putString("LL4/Name", name);
 
-    // SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
-    // SmartDashboard.putNumber("LL4/tx", getTX());
+    SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
+    SmartDashboard.putNumber("LL4/tx", getTX());
     // SmartDashboard.putNumber("LL4/ty", getTY());
     // SmartDashboard.putNumber("LL4/ta", getTA());
     // SmartDashboard.putNumber("LL4/txnc", getTXNC());
     // SmartDashboard.putNumber("LL4/tync", getTYNC());
-    // SmartDashboard.putNumber("LL4/tagID", getTagID());
+    SmartDashboard.putNumber("LL4/tagID", getTagID());
     // SmartDashboard.putNumber("LL4/bestYawErrDeg(A)", getBestGoalYawDeg());
     // SmartDashboard.putNumber("Long/Tag", getBestTagDistanceMeters());
     // SmartDashboard.putNumber("Long/Hub", getDistanceMeters());
