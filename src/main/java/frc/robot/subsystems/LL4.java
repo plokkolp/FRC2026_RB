@@ -17,7 +17,7 @@ public class LL4 extends SubsystemBase {
   private final String name;
 
   public LL4() {
-    this("limelight-shoot");
+    this("limelight-shooter");
   }
 
   public LL4(String name) {
@@ -221,8 +221,8 @@ public double getDistanceMeters() {
 
   @Override
   public void periodic() {
-    SmartDashboard.putString("LL4/Name", name);
-
+    // SmartDashboard.putString("LL4/Name", name);
+    SmartDashboard.putNumber("LL4/Heartbeat", getHeartbeat());
     SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
     SmartDashboard.putNumber("LL4/tx", getTX());
     // SmartDashboard.putNumber("LL4/ty", getTY());

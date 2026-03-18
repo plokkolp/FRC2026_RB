@@ -84,7 +84,6 @@ public class Vision extends SubsystemBase {
     SmartDashboard.putNumber("Vision/YawDeltaDeg", yawDeltaDeg);
     SmartDashboard.putBoolean("Vision/HardSeeded", hasHardSeededPose);
 
-    // 規則 1：尚未 hard seed 時，只要 MultiTag 就硬重設一次 + 融合
     if (!hasHardSeededPose && c.tagCount >= kMinTagsForMultiTag) {
       SmartDashboard.putString("Vision/Gate", "HARDSEED_MULTITAG");
       hardSeedOnce(c);
@@ -93,8 +92,6 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    // 規則 2：hard seed 後
-    // 2A) MultiTag 永遠直接更新
     if (c.tagCount >= kMinTagsForMultiTag) {
       SmartDashboard.putString("Vision/Gate", "MULTITAG_UPDATE");
       fuse(c);
@@ -102,7 +99,6 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    // 2B) SingleTag：距離門檻 + jump < 1.5m + yawDelta < 45deg 才更新
     if (isSingleTagOK(c)
         && hasHardSeededPose
         && jumpM < kSingleTagMaxJumpM
@@ -138,7 +134,6 @@ public class Vision extends SubsystemBase {
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
-    // 你原本的寫法我先照留（如果你發現紅藍對調，再把兩個呼叫交換）
     PoseEstimate pe =
         isRed
             ? LimelightHelpers.getBotPoseEstimate_wpiBlue(kLLName)
@@ -165,7 +160,6 @@ public class Vision extends SubsystemBase {
     drivetrain.resetPose(c.pose);
     hasHardSeededPose = true;
 
-    // hard seed 當下把 EMA 也初始化成同一筆，避免 EMA 把你拉回去
     emaPose = c.pose;
     lastEmaTs = c.timestamp;
 
@@ -177,7 +171,6 @@ public class Vision extends SubsystemBase {
 
   private void fuse(Candidate c) {
 
-    // ===== EMA 綠波：先把 vision pose 平滑後再丟給 estimator =====
     Pose2d filteredPose = emaFilterPose(c.pose, c.timestamp, c.tagCount);
 
     double sx = 0.05;
@@ -208,7 +201,6 @@ public class Vision extends SubsystemBase {
   private Pose2d emaFilterPose(Pose2d measurement, double ts, int tagCount) {
     if (measurement == null) return measurement;
 
-    // 第一筆直接吃
     if (emaPose == null) {
       emaPose = measurement;
       lastEmaTs = ts;
@@ -221,7 +213,7 @@ public class Vision extends SubsystemBase {
     }
 
     double dt = ts - lastEmaTs;
-    if (dt <= 0.0 || dt > 0.5) dt = 0.02; // 保底，避免 timestamp 跳太大
+    if (dt <= 0.0 || dt > 0.5) dt = 0.02; 
 
     double tau = (tagCount >= kMinTagsForMultiTag) ? kEmaTauSecMulti : kEmaTauSecSingle;
 

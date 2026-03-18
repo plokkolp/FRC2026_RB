@@ -178,6 +178,7 @@ public class RobotContainer {
   }
 
   private void configureNamedCommands() {
+    
     NamedCommands.registerCommand("Shoot", new MJ(m_shooter));
     NamedCommands.registerCommand("Shoot1", new MJ1(m_shooter));
     NamedCommands.registerCommand("Shooter", new AutoShoot(m_shooter));
