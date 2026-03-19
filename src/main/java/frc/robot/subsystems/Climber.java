@@ -10,7 +10,7 @@ import frc.robot.constants.ConsClimber;
 
 public class Climber extends SubsystemBase {
 
-  private final TalonFX left  = new TalonFX(ConsClimber.LEFT_CLIMBER_ID);
+  private final TalonFX left  = new TalonFX(ConsClimber.LEFT_CLIMBER_ID,"CANivore");
   private final TalonFX right = new TalonFX(ConsClimber.RIGHT_CLIMBER_ID);
 //-47.8 //-110
   private final PositionVoltage posRequest = new PositionVoltage(0).withSlot(0);

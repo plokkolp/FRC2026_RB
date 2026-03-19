@@ -52,7 +52,7 @@ private static final Pigeon2Configuration pigeonConfigs =
             new MountPoseConfigs()
                 .withMountPoseYaw(180)
         );
-    public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
+    public static final CANBus kCANBus = new CANBus("CANivore", "./logs/example.hoot");
 
     public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5);//5.96
 

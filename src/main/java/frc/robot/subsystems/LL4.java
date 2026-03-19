@@ -16,6 +16,22 @@ public class LL4 extends SubsystemBase {
 
   private final String name;
 
+  private boolean cachedHasTarget = false;
+  private double cachedTx = 0.0;
+  private double cachedTy = 0.0;
+  private double cachedTa = 0.0;
+  private double cachedTxnc = 0.0;
+  private double cachedTync = 0.0;
+  private double cachedTagId = -1.0;
+  private double cachedHeartbeat = 0.0;
+
+  private RawFiducial[] cachedRawFiducials = new RawFiducial[0];
+  private RawDetection[] cachedRawDetections = new RawDetection[0];
+
+  private int cachedBestFiducialId = -1;
+  private double cachedBestTagDistanceMeters = Double.NaN;
+  private double cachedDistanceMeters = Double.NaN;
+
   public LL4() {
     this("limelight-shooter");
   }
@@ -27,60 +43,71 @@ public class LL4 extends SubsystemBase {
     this.name = name;
   }
 
-
   public boolean hasTarget() {
-    return LimelightHelpers.getTV(name);
+    return cachedHasTarget;
   }
 
   public double getTX() {
-    return LimelightHelpers.getTX(name);
+    return cachedTx;
   }
 
   public double getTY() {
-    return LimelightHelpers.getTY(name);
+    return cachedTy;
   }
 
   public double getTA() {
-    return LimelightHelpers.getTA(name);
+    return cachedTa;
   }
 
   public double getTXNC() {
-    return LimelightHelpers.getTXNC(name);
+    
+    return cachedTxnc;
   }
 
   public double getTYNC() {
-    return LimelightHelpers.getTYNC(name);
+    return cachedTync;
   }
 
   public double getTagID() {
-    return LimelightHelpers.getFiducialID(name);
+    return cachedTagId;
   }
 
   public double getHeartbeat() {
-    return LimelightHelpers.getHeartbeat(name);
+    return cachedHeartbeat;
   }
 
   public void setPipeline(int index) {
     LimelightHelpers.setPipelineIndex(name, index);
   }
 
-  public void ledPipelineControl() { LimelightHelpers.setLEDMode_PipelineControl(name); }
-  public void ledForceOn()         { LimelightHelpers.setLEDMode_ForceOn(name); }
-  public void ledForceOff()        { LimelightHelpers.setLEDMode_ForceOff(name); }
-  public void ledForceBlink()      { LimelightHelpers.setLEDMode_ForceBlink(name); }
+  public void ledPipelineControl() {
+    LimelightHelpers.setLEDMode_PipelineControl(name);
+  }
 
+  public void ledForceOn() {
+    LimelightHelpers.setLEDMode_ForceOn(name);
+  }
+
+  public void ledForceOff() {
+    LimelightHelpers.setLEDMode_ForceOff(name);
+  }
+
+  public void ledForceBlink() {
+    LimelightHelpers.setLEDMode_ForceBlink(name);
+  }
 
   public RawFiducial[] getRawFiducials() {
-    return LimelightHelpers.getRawFiducials(name);
+    return cachedRawFiducials;
   }
 
   public RawDetection[] getRawDetections() {
-    return LimelightHelpers.getRawDetections(name);
+    return cachedRawDetections;
   }
 
   public boolean hasTag(int tagId) {
     RawFiducial[] tags = getRawFiducials();
     if (tags == null) return false;
+
     for (RawFiducial t : tags) {
       if (t != null && t.id == tagId) return true;
     }
@@ -92,26 +119,17 @@ public class LL4 extends SubsystemBase {
   }
 
   public int getBestFiducialId() {
-    var results = LimelightHelpers.getLatestResults(name);
-    if (results == null || results.targets_Fiducials == null) return -1;
-
-    LimelightHelpers.LimelightTarget_Fiducial best = null;
-    for (var t : results.targets_Fiducials) {
-      if (best == null || t.ta > best.ta) best = t;
-    }
-    return (best == null) ? -1 : (int) best.fiducialID;
+    return cachedBestFiducialId;
   }
 
   public double getBestGoalYawDeg() {
-    if (!hasTarget()) return Double.NaN;
-    return getTX(); 
+    if (!cachedHasTarget) return Double.NaN;
+    return cachedTx;
   }
 
   public boolean hasLLTarget() {
     return hasTarget();
   }
-
-  //
 
   public PoseEstimate getPoseEstimateBlue_MegaTag1() {
     return LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
@@ -127,14 +145,12 @@ public class LL4 extends SubsystemBase {
       double pitchDeg,
       double pitchRateDegPerSec,
       double rollDeg,
-      double rollRateDegPerSec
-  ) {
+      double rollRateDegPerSec) {
     LimelightHelpers.SetRobotOrientation(
         name,
         yawDeg, yawRateDegPerSec,
         pitchDeg, pitchRateDegPerSec,
-        rollDeg, rollRateDegPerSec
-    );
+        rollDeg, rollRateDegPerSec);
   }
 
   public LimelightHelpers.IMUData getIMU() {
@@ -148,91 +164,69 @@ public class LL4 extends SubsystemBase {
   public void setIMUAssistAlpha(double alpha) {
     LimelightHelpers.SetIMUAssistAlpha(name, alpha);
   }
+
   public double getBestTagDistanceMeters() {
-    var results = LimelightHelpers.getLatestResults(name);
-    if (results == null || results.targets_Fiducials == null) return Double.NaN;
-    LimelightHelpers.LimelightTarget_Fiducial best = null;
-    for (var t : results.targets_Fiducials) {
-      if (best == null || t.ta > best.ta) best = t;
-    }
-    if (best == null) return Double.NaN;
-    var pose = best.getTargetPose_CameraSpace();
-    if (pose == null) return Double.NaN;
-    return pose.getTranslation().getNorm(); 
-    
+    return cachedBestTagDistanceMeters;
   }
- 
-//   public double getDistanceMeters() {
-//   var results = LimelightHelpers.getLatestResults(name);
-//   if (results == null || results.targets_Fiducials == null) return Double.NaN;
 
-//   LimelightHelpers.LimelightTarget_Fiducial best = null;
-//   for (var t : results.targets_Fiducials) {
-//     if (t == null) continue;
-//     if (best == null || t.ta > best.ta) best = t;
-//   }
-//   if (best == null) return Double.NaN;
-
-//   Pose3d tagInCam = best.getTargetPose_CameraSpace();
-//   if (tagInCam == null) return Double.NaN;
-
-//   double forward = -0.60;
-//   double right   =  0.00;
-//   double up      = -0.70;
-
-//   Transform3d tagToPOI = new Transform3d(
-//       new Translation3d(forward, -right, up),
-//       new Rotation3d()
-//   );
-
-//   Pose3d poiInCam = tagInCam.transformBy(tagToPOI);
-
-//   return poiInCam.getTranslation().getNorm();
-// }
-
-public double getDistanceMeters() {
-    var results = LimelightHelpers.getLatestResults(name);
-    if (results == null || results.targets_Fiducials == null) return Double.NaN;
-
-    LimelightHelpers.LimelightTarget_Fiducial best = null;
-    for (var t : results.targets_Fiducials) {
-        if (t == null) continue;
-        if (best == null || t.ta > best.ta) best = t;
-    }
-    if (best == null) return Double.NaN;
-
-    Pose3d tagInCam = best.getTargetPose_CameraSpace();
-    if (tagInCam == null) return Double.NaN;
-
-    
-    double forward_z = -0.6;
-    double right_x   =  0.0; 
-    double up_y      = -0.7; 
-    Transform3d tagToPOI = new Transform3d(
-        new Translation3d(right_x, up_y, forward_z), 
-        new Rotation3d() 
-    );
-
-    Pose3d poiInCam = tagInCam.transformBy(tagToPOI);
-
-    return poiInCam.getTranslation().getNorm();
-}
-  
+  public double getDistanceMeters() {
+    return cachedDistanceMeters;
+  }
 
   @Override
   public void periodic() {
-    // SmartDashboard.putString("LL4/Name", name);
-    SmartDashboard.putNumber("LL4/Heartbeat", getHeartbeat());
-    SmartDashboard.putBoolean("LL4/HasTarget", hasTarget());
-    SmartDashboard.putNumber("LL4/tx", getTX());
-    // SmartDashboard.putNumber("LL4/ty", getTY());
-    // SmartDashboard.putNumber("LL4/ta", getTA());
-    // SmartDashboard.putNumber("LL4/txnc", getTXNC());
-    // SmartDashboard.putNumber("LL4/tync", getTYNC());
-    SmartDashboard.putNumber("LL4/tagID", getTagID());
-    // SmartDashboard.putNumber("LL4/bestYawErrDeg(A)", getBestGoalYawDeg());
-    // SmartDashboard.putNumber("Long/Tag", getBestTagDistanceMeters());
-    // SmartDashboard.putNumber("Long/Hub", getDistanceMeters());
 
+    cachedHeartbeat = LimelightHelpers.getHeartbeat(name);
+    cachedHasTarget = LimelightHelpers.getTV(name);
+    cachedTx = LimelightHelpers.getTX(name);
+    cachedTy = LimelightHelpers.getTY(name);
+    cachedTa = LimelightHelpers.getTA(name);
+    cachedTxnc = LimelightHelpers.getTXNC(name);
+    cachedTync = LimelightHelpers.getTYNC(name);
+    cachedTagId = LimelightHelpers.getFiducialID(name);
+
+    RawFiducial[] fiducials = LimelightHelpers.getRawFiducials(name);
+    cachedRawFiducials = (fiducials != null) ? fiducials : new RawFiducial[0];
+
+    RawDetection[] detections = LimelightHelpers.getRawDetections(name);
+    cachedRawDetections = (detections != null) ? detections : new RawDetection[0];
+
+    cachedBestFiducialId = -1;
+    cachedBestTagDistanceMeters = Double.NaN;
+    cachedDistanceMeters = Double.NaN;
+
+    var results = LimelightHelpers.getLatestResults(name);
+    if (results != null && results.targets_Fiducials != null) {
+      LimelightHelpers.LimelightTarget_Fiducial best = null;
+
+      for (var t : results.targets_Fiducials) {
+        if (t == null) continue;
+        if (best == null || t.ta > best.ta) best = t;
+      }
+
+      if (best != null) {
+        cachedBestFiducialId = (int) best.fiducialID;
+
+        Pose3d tagInCam = best.getTargetPose_CameraSpace();
+        if (tagInCam != null) {
+          cachedBestTagDistanceMeters = tagInCam.getTranslation().getNorm();
+
+          double forward_z = -0.6;
+          double right_x = 0.0;
+          double up_y = -0.7;
+
+          Transform3d tagToPOI = new Transform3d(
+              new Translation3d(right_x, up_y, forward_z),
+              new Rotation3d());
+
+          Pose3d poiInCam = tagInCam.transformBy(tagToPOI);
+          cachedDistanceMeters = poiInCam.getTranslation().getNorm();
+        }
+      }
+    }
+
+    SmartDashboard.putBoolean("LL4/HasTarget", cachedHasTarget);
+    SmartDashboard.putNumber("LL4/tx", cachedTx);
+    SmartDashboard.putNumber("LL4/tagID", cachedTagId);
   }
 }

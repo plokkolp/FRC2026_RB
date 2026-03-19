@@ -19,10 +19,10 @@ public class Shoot2 extends Command {
   private static final double kYawTolDeg = 1.0;
   private static final double kMaxValidTxDeg = 30.0;
 
-  private static final double kNoTagMinCmdThreshold = 0.05; 
-  private static final double kNoTagMinCmd = 0.1;          
+  private static final double kNoTagMinCmdThreshold = 0.05;
+  private static final double kNoTagMinCmd = 0.1;
 
-  private static final double kPostFilterHoldSec = 0.10;    
+  private static final double kPostFilterHoldSec = 0.10;
 
   private static final double kTrainDuty = -0.7;
   private static final double kIntakeDuty = -0.7;
@@ -40,13 +40,13 @@ public class Shoot2 extends Command {
   private double lastTargetRpm = 2200.0;
   private double lastTargetPitchRot = -0.45;
 
- private boolean prevHasTarget = false;          
-  private boolean noTagState = false;             
-  private double noTagStartTime = -0.8;          
+  private boolean prevHasTarget = false;
+  private boolean noTagState = false;
+  private double noTagStartTime = -0.8;
 
-  private double lastSeenYawCmd = 0.0;            
-  private double postFilterHoldCmd = 0.0;         
-  private double postFilterHoldStartTime = -0.2;  
+  private double lastSeenYawCmd = 0.0;
+  private double postFilterHoldCmd = 0.0;
+  private double postFilterHoldStartTime = -0.2;
 
   public Shoot2(Shooter shooter, XboxController controller, XboxController drive) {
     this.shooter = shooter;
@@ -65,6 +65,14 @@ public class Shoot2 extends Command {
     lastSeenYawCmd = 0.0;
     postFilterHoldCmd = 0.0;
     postFilterHoldStartTime = -1.0;
+
+    double dist = shooter.getlong();
+    boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
+    if (distValid) {
+      ShooterLookup.Point sp = ShooterLookup.sample(dist);
+      lastTargetRpm = sp.rpm;
+      lastTargetPitchRot = sp.pitchRot;
+    }
   }
 
   @Override
@@ -85,12 +93,13 @@ public class Shoot2 extends Command {
       noTagStartTime = -1.0;
       postFilterHoldStartTime = -1.0;
 
+      SmartDashboard.putBoolean("Auto/manualOverride", true);
 
     } else {
       SmartDashboard.putBoolean("Auto/manualOverride", false);
 
       boolean hasTarget = shooter.hasLLTarget();
-      double tx = shooter.getLLTx();  
+      double tx = shooter.getLLTx();
       double dist = shooter.getlong();
 
       boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
@@ -145,18 +154,20 @@ public class Shoot2 extends Command {
         if (txLooksUsable) {
           yawCmd = tx * kYawP;
 
-         if (Math.abs(yawCmd) <= kNoTagMinCmdThreshold) {
-  if (Math.abs(lastSeenYawCmd) > 1e-6) {
-    yawCmd = Math.signum(lastSeenYawCmd) * kNoTagMinCmd;
-  } else {
-    yawCmd = 0.0;
-  }
-}
+          if (Math.abs(yawCmd) <= kNoTagMinCmdThreshold) {
+            if (Math.abs(lastSeenYawCmd) > 1e-6) {
+              yawCmd = Math.signum(lastSeenYawCmd) * kNoTagMinCmd;
+            } else {
+              yawCmd = 0.0;
+            }
+          }
+
           yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
 
           if (Math.abs(yawCmd) > 1e-6) {
             postFilterHoldCmd = yawCmd;
           }
+
         } else {
           if (postFilterHoldStartTime < 0.0) {
             postFilterHoldStartTime = now;
@@ -181,7 +192,6 @@ public class Shoot2 extends Command {
       }
 
       shooter.setYawSpeed(yawCmd);
-
     }
 
     boolean trigger = drive.getRightTriggerAxis() > kFireTrig;

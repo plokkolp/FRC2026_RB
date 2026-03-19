@@ -5,50 +5,50 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.hardware.TalonFXS;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer; 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.ShooterLookup;
 import frc.robot.constants.ConsShooter;
 
 public class Shooter extends SubsystemBase {
 
-  private final TalonFX leftShooter  = new TalonFX(ConsShooter.LEFT_SHOOTER_ID);
+  private final TalonFX leftShooter = new TalonFX(ConsShooter.LEFT_SHOOTER_ID);
   private final TalonFX rightShooter = new TalonFX(ConsShooter.RIGHT_SHOOTER_ID);
 
   private final TalonFX train = new TalonFX(ConsShooter.TRAIN_ID);
 
-  private final TalonFX angleMotor = new TalonFX(ConsShooter.ANGLE_MOTOR_ID);   // Yaw
+  private final TalonFX angleMotor = new TalonFX(ConsShooter.ANGLE_MOTOR_ID);
   private final CANcoder angleCancoder = new CANcoder(ConsShooter.ANGLE_CANCODER_ID);
 
-  private final TalonFX minionMotor = new TalonFX(ConsShooter.MINION_MOTOR_ID); // Pitch
+  private final TalonFX minionMotor = new TalonFX(ConsShooter.MINION_MOTOR_ID);
 
   private final LL4 ll4 = new LL4("limelight-shooter");
 
   private final SparkFlex motor = new SparkFlex(51, MotorType.kBrushless);
 
   private final DutyCycleOut shooterDuty = new DutyCycleOut(0);
-  private final DutyCycleOut trainDuty   = new DutyCycleOut(0);
-  private final DutyCycleOut yawDuty     = new DutyCycleOut(0);
-  private final DutyCycleOut pitchDuty   = new DutyCycleOut(0);
+  private final DutyCycleOut trainDuty = new DutyCycleOut(0);
+  private final DutyCycleOut yawDuty = new DutyCycleOut(0);
+  private final DutyCycleOut pitchDuty = new DutyCycleOut(0);
 
   private final VelocityVoltage shooterVel = new VelocityVoltage(0).withSlot(0);
 
-  private final PositionVoltage yawPos   = new PositionVoltage(0).withSlot(0);
+  private final PositionVoltage yawPos = new PositionVoltage(0).withSlot(0);
   private final PositionVoltage pitchPos = new PositionVoltage(0).withSlot(0);
 
-  private double txFilteredDeg = 0.0;     
+  private double txFilteredDeg = 0.0;
   private boolean txEverValid = false;
   private double lastSeenTimeSec = 0.0;
 
-  private static final double kTxAlpha = 0.5;        
-  private static final double kHoldTimeoutSec = 0.25; 
-  private static final double kMaxAbsTxDeg = 35.0;    
+  private static final double kTxAlpha = 0.5;
+  private static final double kHoldTimeoutSec = 0.25;
+  private static final double kMaxAbsTxDeg = 35.0;
 
   public Shooter() {
 
@@ -61,6 +61,8 @@ public class Shooter extends SubsystemBase {
     angleMotor.getConfigurator().apply(ConsShooter.ANGLE_MOTOR_CONFIG);
 
     minionMotor.getConfigurator().apply(ConsShooter.MINION_MOTOR_CONFIG);
+
+    ShooterLookup.sample(2.0);
   }
 
   public void setShooterSpeed(double duty) {
@@ -217,7 +219,7 @@ public class Shooter extends SubsystemBase {
     stopPitch();
   }
 
-  public void setAllTrainSpeed(double speed){
+  public void setAllTrainSpeed(double speed) {
     setTrainSpeed(speed);
     setIntaketrainSpeed(speed);
   }
@@ -227,11 +229,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getLLTxRaw() {
-    return ll4.getTX(); // degrees
+    return ll4.getTX();
   }
 
   public double getLLTx() {
-    return txFilteredDeg; // degrees (filtered + hold)
+    return txFilteredDeg;
   }
 
   public void setIntaketrainSpeed(double speed) {
@@ -241,8 +243,6 @@ public class Shooter extends SubsystemBase {
   public double getlong() {
     return ll4.getBestTagDistanceMeters();
   }
-
-  
 
   @Override
   public void periodic() {
@@ -255,14 +255,11 @@ public class Shooter extends SubsystemBase {
     if (has && Double.isFinite(rawTx) && Math.abs(rawTx) <= kMaxAbsTxDeg) {
       lastSeenTimeSec = now;
       txEverValid = true;
-
       txFilteredDeg = (1.0 - kTxAlpha) * txFilteredDeg + kTxAlpha * rawTx;
     } else {
-      //跳變
       if (txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec) {
-        // keep txFilteredDeg
       } else {
-        txFilteredDeg = 0.0; //超時歸零
+        txFilteredDeg = 0.0;
       }
     }
 

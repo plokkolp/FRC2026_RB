@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
   // ===================== Motors =====================
   private final TalonFX haveRolling  = new TalonFX(ConsIntake.HAVE_ROLLING_ID);
   // private final TalonFX trainRolling = new TalonFX(ConsIntake.TRAIN_ROLLING_ID);
-  private final TalonFX haveAngle    = new TalonFX(ConsIntake.HAVE_ANGLE_ID);
+  private final TalonFX haveAngle    = new TalonFX(ConsIntake.HAVE_ANGLE_ID,"CANivore");
 
   private final DutyCycleOut haveDuty  = new DutyCycleOut(0);
   private final DutyCycleOut trainDuty = new DutyCycleOut(0);
