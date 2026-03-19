@@ -14,9 +14,10 @@ public class Shoot2 extends Command {
   private final XboxController controller;
   private final XboxController drive;
 
-  private static final double kYawP = 0.0065;
-  private static final double kYawMaxOut = 0.15;
-  private static final double kYawTolDeg = 1.0;
+  private static final double kYawP = 0.0045;//45
+  private static final double kYawD = 0.0010;
+  private static final double kYawMaxOut = 0.6;//3
+  private static final double kYawTolDeg = 2;
   private static final double kMaxValidTxDeg = 30.0;
 
   private static final double kTrainDuty = -0.7;
@@ -30,10 +31,15 @@ public class Shoot2 extends Command {
   private static final double kManualDeadband = 0.1;
   private static final double kManualScale = 0.06;
 
+  private static final double kAimOffsetMaxDeg = 30.0;
+
   private double startTime;
 
   private double lastTargetRpm = 2200.0;
   private double lastTargetPitchRot = -0.45;
+
+  private double lastTx = 0.0;
+  private double lastTime = 0.0;
 
   public Shoot2(Shooter shooter, XboxController controller, XboxController drive) {
     this.shooter = shooter;
@@ -45,6 +51,8 @@ public class Shoot2 extends Command {
   @Override
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
+    lastTime = Timer.getFPGATimestamp();
+    lastTx = 0.0;
 
     double dist = shooter.getlong();
     boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
@@ -59,7 +67,7 @@ public class Shoot2 extends Command {
   public void execute() {
 
     boolean manualHeld = controller.getYButton();
-    double rx = controller.getRightX();
+    double rx = drive.getRightX();
 
     if (manualHeld) {
       double manualYawOut = 0.0;
@@ -70,12 +78,18 @@ public class Shoot2 extends Command {
       shooter.setYawSpeed(manualYawOut);
       SmartDashboard.putBoolean("Auto/manualOverride", true);
 
+      lastTime = Timer.getFPGATimestamp();
+      lastTx = 0.0;
+
     } else {
       SmartDashboard.putBoolean("Auto/manualOverride", false);
 
       boolean hasTarget = shooter.hasLLTarget();
       double tx = shooter.getLLTx();
       double dist = shooter.getlong();
+
+      double aimStickX = drive.getLeftX();
+      double aimOffsetDeg = aimStickX * kAimOffsetMaxDeg;
 
       boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
       if (hasTarget && distValid) {
@@ -88,11 +102,21 @@ public class Shoot2 extends Command {
       shooter.setShooterRPM(lastTargetRpm);
 
       double yawCmd = 0.0;
+      double now = Timer.getFPGATimestamp();
+      double dt = now - lastTime;
 
       if (hasTarget) {
         if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
-          if (Math.abs(tx) > kYawTolDeg) {
-            yawCmd = tx * kYawP;
+          double error = tx - aimOffsetDeg;
+
+          if (Math.abs(error) > kYawTolDeg) {
+            double errorRate = 0.0;
+
+            if (dt > 1e-4) {
+              errorRate = (error - lastTx) / dt;
+            }
+
+            yawCmd = error * kYawP + errorRate * kYawD;
             yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
           } else {
             yawCmd = 0.0;
@@ -106,9 +130,10 @@ public class Shoot2 extends Command {
 
       shooter.setYawSpeed(yawCmd);
 
-      SmartDashboard.putBoolean("Auto/hasTarget", hasTarget);
-      SmartDashboard.putNumber("Auto/tx", tx);
-      SmartDashboard.putNumber("Auto/yawCmd", yawCmd);
+      if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
+        lastTx = tx - aimOffsetDeg;
+      }
+      lastTime = now;
     }
 
     boolean trigger = drive.getRightTriggerAxis() > kFireTrig;

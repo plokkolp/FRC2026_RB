@@ -96,7 +96,7 @@ public class RobotContainer {
       .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
         drivetrain::seedFieldCentric, drivetrain));
 // 
-    // new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
+    // new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
     //     .toggleOnTrue(new GetFuelDown(m_intake, operator,driver));
 
     // new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
