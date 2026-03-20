@@ -1,23 +1,37 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Shooter;
 import frc.robot.ShooterLookup;
+import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Shooter;
 
-public class Shoot2 extends Command {
+public class Shoot2Drive extends Command {
 
   private final Shooter shooter;
+  private final CommandSwerveDrivetrain drivetrain;
   private final XboxController controller;
   private final XboxController drive;
 
-  private static final double kYawP = 0.0045;//45
+  private final SwerveRequest.ApplyRobotSpeeds driveRequest =
+      new SwerveRequest.ApplyRobotSpeeds()
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private static final double kYawP = 0.0045;
   private static final double kYawD = 0.0010;
-  private static final double kYawMaxOut = 0.6;//3
-  private static final double kYawTolDeg = 2;
+  private static final double kYawMaxOut = 0.6;
+  private static final double kYawTolDeg = 2.0;
   private static final double kMaxValidTxDeg = 30.0;
 
   private static final double kTrainDuty = -0.7;
@@ -31,21 +45,24 @@ public class Shoot2 extends Command {
   private static final double kManualDeadband = 0.1;
   private static final double kManualScale = 0.06;
 
-  private static final double kAimOffsetMaxDeg = 30.0;
+  private static final double kMaxOmegaRadPerSec = 1.0 * Math.PI;
 
   private double startTime;
-
   private double lastTargetRpm = 2200.0;
   private double lastTargetPitchRot = -0.45;
-
   private double lastTx = 0.0;
   private double lastTime = 0.0;
 
-  public Shoot2(Shooter shooter, XboxController controller, XboxController drive) {
+  public Shoot2Drive(
+      Shooter shooter,
+      CommandSwerveDrivetrain drivetrain,
+      XboxController controller,
+      XboxController drive) {
     this.shooter = shooter;
+    this.drivetrain = drivetrain;
     this.controller = controller;
     this.drive = drive;
-    addRequirements(shooter);
+    addRequirements(shooter, drivetrain);
   }
 
   @Override
@@ -65,6 +82,26 @@ public class Shoot2 extends Command {
 
   @Override
   public void execute() {
+
+    double xInput = -drive.getLeftY();
+    double yInput = -drive.getLeftX();
+    double omegaInput = drive.getRightX();
+
+    double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+
+    double xMps = xInput ;
+    double yMps = yInput;
+    double omegaRadPerSec = omegaInput;
+
+    Rotation2d heading = drivetrain.getTeleopHeading();
+
+    ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        xMps,
+        yMps,
+        omegaRadPerSec,
+        heading);
+
+    drivetrain.setControl(driveRequest.withSpeeds(robotSpeeds));
 
     boolean manualHeld = controller.getYButton();
     double rx = drive.getRightX();
@@ -88,9 +125,6 @@ public class Shoot2 extends Command {
       double tx = shooter.getLLTx();
       double dist = shooter.getlong();
 
-      double aimStickX = drive.getLeftX();
-      double aimOffsetDeg = aimStickX * kAimOffsetMaxDeg;
-
       boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
       if (hasTarget && distValid) {
         ShooterLookup.Point sp = ShooterLookup.sample(dist);
@@ -107,31 +141,24 @@ public class Shoot2 extends Command {
 
       if (hasTarget) {
         if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
-          double error = tx - aimOffsetDeg;
+          double error = tx;
 
           if (Math.abs(error) > kYawTolDeg) {
             double errorRate = 0.0;
-
             if (dt > 1e-4) {
               errorRate = (error - lastTx) / dt;
             }
 
             yawCmd = error * kYawP + errorRate * kYawD;
             yawCmd = MathUtil.clamp(yawCmd, -kYawMaxOut, kYawMaxOut);
-          } else {
-            yawCmd = 0.0;
           }
-        } else {
-          yawCmd = 0.0;
         }
-      } else {
-        yawCmd = 0.0;
       }
 
       shooter.setYawSpeed(yawCmd);
 
       if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
-        lastTx = tx - aimOffsetDeg;
+        lastTx = tx;
       }
       lastTime = now;
     }
@@ -153,16 +180,21 @@ public class Shoot2 extends Command {
       shooter.setTrainSpeed(-kTrainDuty);
       shooter.setIntaketrainSpeed(-kIntakeDuty);
     } else {
-      shooter.setTrainSpeed(0);
-      shooter.setIntaketrainSpeed(0);
+      shooter.setTrainSpeed(0.0);
+      shooter.setIntaketrainSpeed(0.0);
     }
+
+    SmartDashboard.putNumber("Shoot2Drive/xMps", xMps);
+    SmartDashboard.putNumber("Shoot2Drive/yMps", yMps);
+    SmartDashboard.putNumber("Shoot2Drive/omega", omegaRadPerSec);
   }
 
   @Override
   public void end(boolean interrupted) {
-    shooter.setYawSpeed(0);
-    shooter.setTrainSpeed(0);
-    shooter.setIntaketrainSpeed(0);
+    drivetrain.setControl(driveRequest.withSpeeds(new ChassisSpeeds()));
+    shooter.setYawSpeed(0.0);
+    shooter.setTrainSpeed(0.0);
+    shooter.setIntaketrainSpeed(0.0);
     shooter.stopPitch();
     shooter.stopShooter();
   }

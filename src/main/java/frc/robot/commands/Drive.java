@@ -48,9 +48,9 @@ public class Drive extends Command {
 
     double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
-    double xMps = xInput ;//* maxSpeedMps;
-    double yMps = yInput ;//* maxSpeedMps;
-    double omegaRadPerSec = omegaInput;// * kMaxOmegaRadPerSec;
+    double xMps = -xInput * maxSpeedMps*0.6;
+    double yMps = -yInput * maxSpeedMps*0.6;
+    double omegaRadPerSec = omegaInput * kMaxOmegaRadPerSec*0.6;
 
     Rotation2d heading = drivetrain.getTeleopHeading();
 
