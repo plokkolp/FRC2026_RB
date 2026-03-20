@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5286754385964911,
-        "y": 6.445710526315789
+        "x": 0.43320175438259667,
+        "y": 4.9579122807004525
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2472017543859653,
-        "y": 6.047903508771931
+        "x": 0.4441507215694655,
+        "y": 6.96897072096911
       },
       "isLocked": false,
-      "linkedName": "M3 END"
+      "linkedName": "M1E"
     },
     {
       "anchor": {
-        "x": 1.9528245614035087,
-        "y": 5.0692982456140365
+        "x": 0.433,
+        "y": 6.978771929824561
       },
       "prevControl": {
-        "x": 1.8474057017543863,
-        "y": 5.4114122807017555
+        "x": 0.43244311970481647,
+        "y": 4.961117001181797
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "M2E"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.12711864406779833,
-      "rotationDegrees": 90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -47,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 148.24051991518724
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "MIDDLE",
+  "folder": "MIDDLEEEEEEEEE",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 90.0

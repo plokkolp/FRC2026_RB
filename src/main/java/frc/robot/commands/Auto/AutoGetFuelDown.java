@@ -7,7 +7,7 @@ public class AutoGetFuelDown extends Command {
 
   private final Intake intake;
 
-  private static final double POS_DOWN = 14.81;
+  private static final double POS_DOWN = 14.8;
 
   public AutoGetFuelDown(Intake intake) {
     this.intake = intake;
@@ -17,7 +17,7 @@ public class AutoGetFuelDown extends Command {
   @Override
   public void initialize() {
     intake.setAnglePositionRot(POS_DOWN);
-    intake.setRolling(0.9);
+    intake.setRolling(0.95);
   }
 
   @Override
