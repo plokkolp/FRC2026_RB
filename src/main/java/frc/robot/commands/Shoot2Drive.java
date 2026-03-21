@@ -47,6 +47,8 @@ public class Shoot2Drive extends Command {
 
   private static final double kMaxOmegaRadPerSec = 1.0 * Math.PI;
 
+  private static final double kShotRpmOffset = 200.0;
+
   private double startTime;
   private double lastTargetRpm = 2200.0;
   private double lastTargetPitchRot = -0.45;
@@ -73,9 +75,10 @@ public class Shoot2Drive extends Command {
 
     double dist = shooter.getlong();
     boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
+
     if (distValid) {
       ShooterLookup.Point sp = ShooterLookup.sample(dist);
-      lastTargetRpm = sp.rpm;
+      lastTargetRpm = sp.rpm + kShotRpmOffset;
       lastTargetPitchRot = sp.pitchRot;
     }
   }
@@ -90,8 +93,8 @@ public class Shoot2Drive extends Command {
     double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
     double xMps = xInput ;
-    double yMps = yInput;
-    double omegaRadPerSec = omegaInput;
+    double yMps = yInput ;
+    double omegaRadPerSec = omegaInput ;
 
     Rotation2d heading = drivetrain.getTeleopHeading();
 
@@ -108,6 +111,7 @@ public class Shoot2Drive extends Command {
 
     if (manualHeld) {
       double manualYawOut = 0.0;
+
       if (Math.abs(rx) > kManualDeadband) {
         manualYawOut = MathUtil.clamp(rx * kManualScale, -1.0, 1.0);
       }
@@ -126,9 +130,10 @@ public class Shoot2Drive extends Command {
       double dist = shooter.getlong();
 
       boolean distValid = Double.isFinite(dist) && dist > 0.05 && dist < 10.0;
+
       if (hasTarget && distValid) {
         ShooterLookup.Point sp = ShooterLookup.sample(dist);
-        lastTargetRpm = sp.rpm;
+        lastTargetRpm = sp.rpm + kShotRpmOffset;
         lastTargetPitchRot = sp.pitchRot;
       }
 
@@ -145,6 +150,7 @@ public class Shoot2Drive extends Command {
 
           if (Math.abs(error) > kYawTolDeg) {
             double errorRate = 0.0;
+
             if (dt > 1e-4) {
               errorRate = (error - lastTx) / dt;
             }
@@ -160,6 +166,7 @@ public class Shoot2Drive extends Command {
       if (Double.isFinite(tx) && Math.abs(tx) <= kMaxValidTxDeg) {
         lastTx = tx;
       }
+
       lastTime = now;
     }
 
@@ -183,10 +190,6 @@ public class Shoot2Drive extends Command {
       shooter.setTrainSpeed(0.0);
       shooter.setIntaketrainSpeed(0.0);
     }
-
-    SmartDashboard.putNumber("Shoot2Drive/xMps", xMps);
-    SmartDashboard.putNumber("Shoot2Drive/yMps", yMps);
-    SmartDashboard.putNumber("Shoot2Drive/omega", omegaRadPerSec);
   }
 
   @Override

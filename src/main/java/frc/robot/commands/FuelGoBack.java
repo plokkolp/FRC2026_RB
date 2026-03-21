@@ -66,7 +66,7 @@ public class FUELGOBACK extends Command {
         shooter.setPitchPosition(-2.45);
 
         if (shooter.getPitchPositionRot() < -2.1) {
-          shooter.setShooterSpeed(0.9);
+          shooter.setShooterSpeed(0.6);
           shooter.setIntaketrainSpeed(-0.7);
           shooter.setTrainSpeed(-0.7);
         } else {

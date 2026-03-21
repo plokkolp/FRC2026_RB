@@ -16,9 +16,9 @@ public class Shoot2Static extends Command {
 
   private static final double kYawP = 0.0045;
   private static final double kYawD = 0.0010;
-  private static final double kYawMaxOut = 0.6;
-  private static final double kYawTolDeg = 2.0;
-  private static final double kMaxValidTxDeg = 30.0;
+  private static final double kYawMaxOut = 0.2;
+  private static final double kYawTolDeg = 1.4;
+  private static final double kMaxValidTxDeg =20;
 
   private static final double kTrainDuty = -0.7;
   private static final double kIntakeDuty = -0.7;

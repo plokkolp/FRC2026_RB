@@ -26,9 +26,9 @@ import com.pathplanner.lib.auto.NamedCommands;
 public class RobotContainer {
 
   private final XboxController driver = new XboxController(ConsController.kDriveControllerPort);
-  private final XboxController testJoy = new XboxController(3);
+  // private final XboxController testJoy = new XboxController(3);
   private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);
-  private final XboxController TT = new XboxController(4);
+  // private final XboxController TT = new XboxController(4);
 
   private final Shooter m_shooter = new Shooter();
   private final Intake m_intake = new Intake();
@@ -53,10 +53,13 @@ public class RobotContainer {
 
   private void configureBindings() {
     setDefaultCommand();
-    Trigger leftTrigger = new Trigger(() -> testJoy.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id) > 1);
+    // Trigger leftTrigger = new Trigger(() -> testJoy.getRawAxis(ConsController.Axis.LEFT_TRIGGER.id) > 1);
     
-    new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+    new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
         .toggleOnTrue(new Shoot2Drive(m_shooter, drivetrain, operator, driver));
+
+    new JoystickButton(driver, ConsController.Button.BUTTON_Y.id)
+        .toggleOnTrue(new Shoot2Static(m_shooter, operator, driver));
 
     new JoystickButton(driver, ConsController.Button.BUTTON_B.id)
         .toggleOnTrue(new Climb(m_Climber, driver));
@@ -68,20 +71,20 @@ public class RobotContainer {
       .onTrue(new edu.wpi.first.wpilibj2.command.InstantCommand(
         drivetrain::seedFieldCentric, drivetrain));
 // 
-    new JoystickButton(driver, ConsController.Button.BUTTON_RB.id)
+    new JoystickButton(operator, ConsController.Button.BUTTON_RB.id)
         .toggleOnTrue(new GetFuelDown(m_intake, operator,driver));
 
-    // new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
-    //     .toggleOnTrue(new GetFuelUp(m_intake));
+    new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
+        .toggleOnTrue(new GetFuelUp(m_intake));
 
       
 //====================================================================//
 
-    new JoystickButton(testJoy, ConsController.Button.BUTTON_B.id)
-            .whileTrue(new ClimberTest( m_Climber,0.4));
+    // new JoystickButton(testJoy, ConsController.Button.BUTTON_B.id)
+    //         .whileTrue(new ClimberTest( m_Climber,0.4));
 
-    new JoystickButton(testJoy, ConsController.Button.BUTTON_X.id)
-            .whileTrue(new ClimberTest( m_Climber,-0.5));
+    // new JoystickButton(testJoy, ConsController.Button.BUTTON_X.id)
+    //         .whileTrue(new ClimberTest( m_Climber,-0.5));
 //====================================================================//  
   }
 
