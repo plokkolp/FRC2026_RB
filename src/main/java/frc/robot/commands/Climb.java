@@ -17,7 +17,7 @@ public class Climb extends Command {
 
 @Override
   public void initialize() {
-   climber.setPosition(-47.8);
+   climber.setPosition(-67.8);
 
   }
 

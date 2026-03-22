@@ -83,6 +83,17 @@ public class FUELGOBACK extends Command {
 
     } else {
       shooter.setYawSpeed(0.0);
+        shooter.setPitchPosition(-0.23);
+        shooter.setShooterSpeed(0.0);
+        shooter.setIntaketrainSpeed(0.0);
+        shooter.setTrainSpeed(0.0);
+
+    }
+
+    if(driver.getLeftTriggerAxis() > 0.3){
+      
+      shooter.setIntaketrainSpeed(0.7);
+      shooter.setTrainSpeed(0.7);
 
     }
 
