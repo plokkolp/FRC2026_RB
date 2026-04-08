@@ -3,81 +3,52 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.633508771929824,
+        "x": 7.705,
         "y": 4.719228070175438
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.660385964912281,
-        "y": 3.5814999999999992
+        "x": 7.583433489799012,
+        "y": 7.286750567123287
       },
       "isLocked": false,
       "linkedName": "L2"
     },
     {
       "anchor": {
-        "x": 6.027120934442625,
-        "y": 7.455088100907829
+        "x": 7.5937280701754375,
+        "y": 7.368622807017545
       },
       "prevControl": {
-        "x": 6.057398778879267,
-        "y": 6.665701442381065
+        "x": 7.683433100740851,
+        "y": 5.056451066029561
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "L3"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.05205811138013512,
-      "rotationDegrees": -165.0
-    },
-    {
-      "waypointRelativePos": 0.09927360774817975,
-      "rotationDegrees": 178.0
-    },
-    {
-      "waypointRelativePos": 0.15012106537530007,
-      "rotationDegrees": 160.0
-    },
-    {
-      "waypointRelativePos": 0.19854721549636523,
-      "rotationDegrees": 142.0
-    },
-    {
-      "waypointRelativePos": 0.26,
-      "rotationDegrees": 126.0
-    },
-    {
-      "waypointRelativePos": 0.3680387409200959,
-      "rotationDegrees": 108.0
-    },
-    {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 97.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.1,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
-    "unlimited": true
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": -0.5
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "LEFTTTTTTTTTTTT",
   "idealStartingState": {
-    "velocity": 0.5,
-    "rotation": -152.0
+    "velocity": 0.3,
+    "rotation": -90.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

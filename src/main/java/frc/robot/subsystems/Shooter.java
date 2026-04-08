@@ -263,14 +263,14 @@ public class Shooter extends SubsystemBase {
       }
     }
 
-    SmartDashboard.putNumber("LL/tx_raw", rawTx);
-    SmartDashboard.putNumber("LL/tx_filtered", txFilteredDeg);
-    SmartDashboard.putBoolean("LL/tx_hold_active",
-        txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec);
+    // SmartDashboard.putNumber("LL/tx_raw", rawTx);
+    // SmartDashboard.putNumber("LL/tx_filtered", txFilteredDeg);
+    // SmartDashboard.putBoolean("LL/tx_hold_active",
+    //     txEverValid && (now - lastSeenTimeSec) <= kHoldTimeoutSec);
 
     SmartDashboard.putNumber("Yaw/MotorPositionRot", getYawMotorPositionRot());
-    SmartDashboard.putNumber("Yaw/CANCoderAbs", getYawAbsRot());
-    SmartDashboard.putNumber("Yaw/CANCoderNoOffset", getYawCanNoOffsetRot());
-    SmartDashboard.putNumber("Pitch", getPitchPositionRot());
+    // SmartDashboard.putNumber("Yaw/CANCoderAbs", getYawAbsRot());
+    // SmartDashboard.putNumber("Yaw/CANCoderNoOffset", getYawCanNoOffsetRot());
+    // SmartDashboard.putNumber("Pitch", getPitchPositionRot());
   }
 }

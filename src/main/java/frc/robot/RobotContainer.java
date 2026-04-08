@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.Auto.AutoGetFuelDown;
 import frc.robot.commands.Auto.AutoGetFuelUp;
+import frc.robot.commands.Auto.AutoIntakeShoot;
 import frc.robot.commands.Auto.AutoShoot;
+import frc.robot.commands.Auto.AutoStop;
 import frc.robot.constants.ConsController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
@@ -26,7 +28,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 public class RobotContainer {
 
   private final XboxController driver = new XboxController(ConsController.kDriveControllerPort);
-  // private final XboxController testJoy = new XboxController(3);
+  private final XboxController testJoy = new XboxController(3);
   private final XboxController operator = new XboxController(ConsController.kOperatorControllerPort);
   // private final XboxController TT = new XboxController(4);
 
@@ -77,14 +79,13 @@ public class RobotContainer {
     new JoystickButton(operator, ConsController.Button.BUTTON_LB.id)
         .toggleOnTrue(new GetFuelUp(m_intake));
 
-      
 //====================================================================//
 
-    // new JoystickButton(testJoy, ConsController.Button.BUTTON_B.id)
-    //         .whileTrue(new ClimberTest( m_Climber,0.4));
+    new JoystickButton(testJoy, ConsController.Button.BUTTON_B.id)
+            .whileTrue(new ClimberTest( m_Climber,0.4));
 
-    // new JoystickButton(testJoy, ConsController.Button.BUTTON_X.id)
-    //         .whileTrue(new ClimberTest( m_Climber,-0.5));
+    new JoystickButton(testJoy, ConsController.Button.BUTTON_X.id)
+            .whileTrue(new ClimberTest( m_Climber,-0.5));
 //====================================================================//  
   }
 
@@ -114,7 +115,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shooter", new AutoShoot(m_shooter));
     NamedCommands.registerCommand("UP", new AutoGetFuelUp(m_intake));
     NamedCommands.registerCommand("DOWN", new AutoGetFuelDown(m_intake));
-    
+    NamedCommands.registerCommand("STOP", new AutoStop(drivetrain));
+    NamedCommands.registerCommand("Intake", new AutoIntakeShoot(m_intake));
 
   }
 }

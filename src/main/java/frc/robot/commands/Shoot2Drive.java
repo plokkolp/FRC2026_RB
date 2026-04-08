@@ -47,7 +47,7 @@ public class Shoot2Drive extends Command {
 
   private static final double kMaxOmegaRadPerSec = 1.0 * Math.PI;
 
-  private static final double kShotRpmOffset = 200.0;
+  private static final double kShotRpmOffset = 180.0;
 
   private double startTime;
   private double lastTargetRpm = 2200.0;
@@ -139,7 +139,7 @@ public class Shoot2Drive extends Command {
 
       shooter.setPitchPosition(lastTargetPitchRot);
       shooter.setShooterRPM(lastTargetRpm);
-
+ 
       double yawCmd = 0.0;
       double now = Timer.getFPGATimestamp();
       double dt = now - lastTime;

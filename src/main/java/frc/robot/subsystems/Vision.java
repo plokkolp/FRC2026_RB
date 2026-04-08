@@ -60,15 +60,15 @@ public class Vision extends SubsystemBase {
             .getEntry("tid")
             .getDouble(-1.0);
 
-    SmartDashboard.putBoolean("Vision/LL/HasTarget", tv);
-    SmartDashboard.putNumber("Vision/LL/TagID", tid);
+    // SmartDashboard.putBoolean("Vision/LL/HasTarget", tv);
+    // SmartDashboard.putNumber("Vision/LL/TagID", tid);
 
     Pose2d odo = drivetrain.getPose();
     Optional<Candidate> candOpt = getCandidate();
 
     if (candOpt.isEmpty()) {
-      SmartDashboard.putString("Vision/Gate", "NO_CANDIDATE");
-      SmartDashboard.putBoolean("Vision/WillUpdatePose", false);
+      // SmartDashboard.putString("Vision/Gate", "NO_CANDIDATE");
+      // SmartDashboard.putBoolean("Vision/WillUpdatePose", false);
       return;
     }
 
@@ -78,11 +78,11 @@ public class Vision extends SubsystemBase {
     double yawDeltaDeg =
         Math.abs(odo.getRotation().minus(c.pose.getRotation()).getDegrees());
 
-    SmartDashboard.putNumber("Vision/TagCount", c.tagCount);
-    SmartDashboard.putNumber("Vision/AvgDist", c.avgDist);
-    SmartDashboard.putNumber("Vision/JumpM", jumpM);
-    SmartDashboard.putNumber("Vision/YawDeltaDeg", yawDeltaDeg);
-    SmartDashboard.putBoolean("Vision/HardSeeded", hasHardSeededPose);
+    // SmartDashboard.putNumber("Vision/TagCount", c.tagCount);
+    // SmartDashboard.putNumber("Vision/AvgDist", c.avgDist);
+    // SmartDashboard.putNumber("Vision/JumpM", jumpM);
+    // SmartDashboard.putNumber("Vision/YawDeltaDeg", yawDeltaDeg);
+    // SmartDashboard.putBoolean("Vision/HardSeeded", hasHardSeededPose);
 
     if (!hasHardSeededPose && c.tagCount >= kMinTagsForMultiTag) {
       SmartDashboard.putString("Vision/Gate", "HARDSEED_MULTITAG");
@@ -110,8 +110,8 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    SmartDashboard.putString("Vision/Gate", "REJECT");
-    SmartDashboard.putBoolean("Vision/WillUpdatePose", false);
+    // SmartDashboard.putString("Vision/Gate", "REJECT");
+    // SmartDashboard.putBoolean("Vision/WillUpdatePose", false);
   }
 
   private static class Candidate {
@@ -163,10 +163,10 @@ public class Vision extends SubsystemBase {
     emaPose = c.pose;
     lastEmaTs = c.timestamp;
 
-    SmartDashboard.putNumber("Vision/HardSeedTs", Timer.getFPGATimestamp());
-    SmartDashboard.putNumber("Vision/HardSeedX", c.pose.getX());
-    SmartDashboard.putNumber("Vision/HardSeedY", c.pose.getY());
-    SmartDashboard.putNumber("Vision/HardSeedDeg", c.pose.getRotation().getDegrees());
+    // SmartDashboard.putNumber("Vision/HardSeedTs", Timer.getFPGATimestamp());
+    // SmartDashboard.putNumber("Vision/HardSeedX", c.pose.getX());
+    // SmartDashboard.putNumber("Vision/HardSeedY", c.pose.getY());
+    // SmartDashboard.putNumber("Vision/HardSeedDeg", c.pose.getRotation().getDegrees());
   }
 
   private void fuse(Candidate c) {
@@ -193,9 +193,9 @@ public class Vision extends SubsystemBase {
 
     drivetrain.addVisionMeasurement(filteredPose, c.timestamp, stdDevs);
 
-    SmartDashboard.putNumber("Vision/FuseStdX", sx);
-    SmartDashboard.putNumber("Vision/FuseStdY", sy);
-    SmartDashboard.putNumber("Vision/FuseStdDeg", Math.toDegrees(st));
+    // SmartDashboard.putNumber("Vision/FuseStdX", sx);
+    // SmartDashboard.putNumber("Vision/FuseStdY", sy);
+    // SmartDashboard.putNumber("Vision/FuseStdDeg", Math.toDegrees(st));
   }
 
   private Pose2d emaFilterPose(Pose2d measurement, double ts, int tagCount) {
@@ -205,10 +205,10 @@ public class Vision extends SubsystemBase {
       emaPose = measurement;
       lastEmaTs = ts;
 
-      SmartDashboard.putNumber("Vision/EMA/Alpha", 1.0);
-      SmartDashboard.putNumber("Vision/EMA/X", emaPose.getX());
-      SmartDashboard.putNumber("Vision/EMA/Y", emaPose.getY());
-      SmartDashboard.putNumber("Vision/EMA/Deg", emaPose.getRotation().getDegrees());
+      // SmartDashboard.putNumber("Vision/EMA/Alpha", 1.0);
+      // SmartDashboard.putNumber("Vision/EMA/X", emaPose.getX());
+      // SmartDashboard.putNumber("Vision/EMA/Y", emaPose.getY());
+      // SmartDashboard.putNumber("Vision/EMA/Deg", emaPose.getRotation().getDegrees());
       return emaPose;
     }
 
@@ -229,10 +229,10 @@ public class Vision extends SubsystemBase {
     emaPose = new Pose2d(x, y, r);
     lastEmaTs = ts;
 
-    SmartDashboard.putNumber("Vision/EMA/Alpha", alpha);
-    SmartDashboard.putNumber("Vision/EMA/X", emaPose.getX());
-    SmartDashboard.putNumber("Vision/EMA/Y", emaPose.getY());
-    SmartDashboard.putNumber("Vision/EMA/Deg", emaPose.getRotation().getDegrees());
+    // SmartDashboard.putNumber("Vision/EMA/Alpha", alpha);
+    // SmartDashboard.putNumber("Vision/EMA/X", emaPose.getX());
+    // SmartDashboard.putNumber("Vision/EMA/Y", emaPose.getY());
+    // SmartDashboard.putNumber("Vision/EMA/Deg", emaPose.getRotation().getDegrees());
 
     return emaPose;
   }

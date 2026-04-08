@@ -9,15 +9,53 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "DOWN"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
                   "pathName": "New Path"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "STOP"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 0.01
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "DOWN"
+                  "name": "Shooter"
                 }
               }
             ]

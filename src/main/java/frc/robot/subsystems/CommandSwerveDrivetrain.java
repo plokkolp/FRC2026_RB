@@ -234,18 +234,18 @@ speeds -> {
   public void periodic() {
     m_poseEstimator.update(getOdomHeading(), getState().ModulePositions);
 
-    SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
-    SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
-    SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/GyroYaw_raw", getPigeon2().getYaw().getValueAsDouble());
+    // SmartDashboard.putNumber("DEBUG/OdomHeading_used", getOdomHeading().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/TeleopHeading_used", getTeleopHeading().getDegrees());
 
-    SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
-    SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/PoseDeg_phoenix", getState().Pose.getRotation().getDegrees());
+    // SmartDashboard.putNumber("DEBUG/PoseDeg_est", getPose().getRotation().getDegrees());
 
-    SmartDashboard.putNumber("Pose/X", getPose().getX());
-    SmartDashboard.putNumber("Pose/Y", getPose().getY());
+    // SmartDashboard.putNumber("Pose/X", getPose().getX());
+    // SmartDashboard.putNumber("Pose/Y", getPose().getY());
 
     field.setRobotPose(getPose());
-    SmartDashboard.putData("field", field);
+    // SmartDashboard.putData("field", field);
   }
 
   public Pose2d getPose() {

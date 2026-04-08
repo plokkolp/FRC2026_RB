@@ -225,8 +225,8 @@ public class LL4 extends SubsystemBase {
       }
     }
 
-    SmartDashboard.putBoolean("LL4/HasTarget", cachedHasTarget);
-    SmartDashboard.putNumber("LL4/tx", cachedTx);
-    SmartDashboard.putNumber("LL4/tagID", cachedTagId);
+    // SmartDashboard.putBoolean("LL4/HasTarget", cachedHasTarget);
+    // SmartDashboard.putNumber("LL4/tx", cachedTx);
+    // SmartDashboard.putNumber("LL4/tagID", cachedTagId);
   }
 }

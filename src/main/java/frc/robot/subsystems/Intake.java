@@ -78,10 +78,10 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Intake/AnglePosRot", getAnglePositionRot());
+    // SmartDashboard.putNumber("Intake/AnglePosRot", getAnglePositionRot());
     // SmartDashboard.putNumber("Intake/AngleVelRPS", getAngleVelocityRPS());
 
-    SmartDashboard.putNumber("Intake/HaveRollerRPS", getRollingRPS());
+    // SmartDashboard.putNumber("Intake/HaveRollerRPS", getRollingRPS());
     // SmartDashboard.putNumber("Intake/TrainRollerRPS", getTrainRollingRPS());
   }
 }

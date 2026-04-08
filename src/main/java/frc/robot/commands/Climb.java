@@ -17,7 +17,7 @@ public class Climb extends Command {
 
 @Override
   public void initialize() {
-   climber.setPosition(-67.8);
+   climber.setPosition(-88.8);
 
   }
 
@@ -25,7 +25,7 @@ public class Climb extends Command {
   public void execute() {
     
     if(controller.getXButtonPressed()){
-       climber.setPosition(-135);
+       climber.setPosition(-188);
     }
   }
 

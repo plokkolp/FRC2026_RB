@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.Auto;
 
 import java.util.function.DoubleSupplier;
 
@@ -15,10 +15,9 @@ import frc.robot.generated.TunerConstants;
 
 import static edu.wpi.first.units.Units.*;
 
-public class Drive extends Command {
+public class AutoStop extends Command {
 
   private final CommandSwerveDrivetrain drivetrain;
-  private final DoubleSupplier vX, vY, vOmega;
 
   private final SwerveRequest.ApplyRobotSpeeds driveRequest = new SwerveRequest.ApplyRobotSpeeds()
       .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -27,30 +26,24 @@ public class Drive extends Command {
 
   private static final double kMaxOmegaRadPerSec = 1 * Math.PI;
 
-  public Drive(
-      CommandSwerveDrivetrain drivetrain,
-      DoubleSupplier vX,
-      DoubleSupplier vY,
-      DoubleSupplier vOmega) {
+  public AutoStop(
+      CommandSwerveDrivetrain drivetrain) {
     this.drivetrain = drivetrain;
-    this.vX = vX;
-    this.vY = vY;
-    this.vOmega = vOmega;
     addRequirements(drivetrain);
   }
 
   @Override
   public void execute() {
 
-    double xInput = -vX.getAsDouble();
-    double yInput = -vY.getAsDouble();
-    double omegaInput = -vOmega.getAsDouble();
+    double xInput = 0;
+    double yInput = 0;
+    double omegaInput = 0;
 
     double maxSpeedMps = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
     double xMps = -xInput * maxSpeedMps;
     double yMps = -yInput * maxSpeedMps;
-    double omegaRadPerSec = omegaInput * kMaxOmegaRadPerSec*1.05;
+    double omegaRadPerSec = omegaInput * kMaxOmegaRadPerSec;
 
     Rotation2d heading = drivetrain.getTeleopHeading();
 

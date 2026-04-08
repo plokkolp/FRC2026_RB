@@ -15,11 +15,11 @@ public class FUELGOBACK extends Command {
 
   private static final double kEnableRangeDeg = 90.0;
 
-  private static final double kCenterRot = -0.147705078125; 
-  private static final double kRotPerDeg = -0.01607;        
+  private static final double kCenterRot = -0.46826171875 +0.07421875;//-0.39404296875
+  private static final double kRotPerDeg = -0.01607;
 
-  private static final double kMinRot = -1.759521484375 - 0.147949218750 + 0.25; 
-  private static final double kMaxRot =  1.13330078125  - 0.147949218750 + 0.25; 
+  private static final double kMinRot = -1.828857421875 +0.07421875;//-1.759521484375 - 0.147949218750 + 0.25+0.23828125; 
+  private static final double kMaxRot = 1.039306640625 +0.07421875; //1.13330078125  - 0.147949218750 + 0.25+0.23828125; 
 
   private static final double kP = 0.8;
   private static final double kMaxOut = 0.25;
@@ -66,7 +66,7 @@ public class FUELGOBACK extends Command {
         shooter.setPitchPosition(-2.45);
 
         if (shooter.getPitchPositionRot() < -2.1) {
-          shooter.setShooterSpeed(0.6);
+          shooter.setShooterSpeed(0.8);
           shooter.setIntaketrainSpeed(-0.7);
           shooter.setTrainSpeed(-0.7);
         } else {

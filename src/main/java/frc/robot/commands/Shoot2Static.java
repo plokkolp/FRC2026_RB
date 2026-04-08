@@ -71,7 +71,7 @@ public class Shoot2Static extends Command {
       }
 
       shooter.setYawSpeed(manualYawOut);
-      SmartDashboard.putBoolean("Auto/manualOverride", true);
+      // SmartDashboard.putBoolean("Auto/manualOverride", true);
 
       lastTime = Timer.getFPGATimestamp();
       lastTx = 0.0;

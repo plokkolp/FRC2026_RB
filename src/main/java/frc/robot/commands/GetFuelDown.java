@@ -10,9 +10,9 @@ public class GetFuelDown extends Command {
   private final XboxController controller;
     private final XboxController driver;
 
-  private static final double POS_up = 5.9765625;
+  private static final double POS_up = 6.1;
 
-  private static final double POS_DOWN = 14.84;
+  private static final double POS_DOWN = 15.61474609375;
 
   public GetFuelDown(Intake intake, XboxController controller,XboxController driver) {
     this.intake = intake;
@@ -21,6 +21,7 @@ public class GetFuelDown extends Command {
     addRequirements(intake);
   }
 
+  
   @Override
   public void initialize() {
     intake.setAnglePositionRot(POS_DOWN);   
